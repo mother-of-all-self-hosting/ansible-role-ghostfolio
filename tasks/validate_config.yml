@@ -5,7 +5,7 @@
 
 ---
 
-- name: Fail if required Docmost settings not defined
+- name: Fail if required Ghostfolio settings not defined
   ansible.builtin.fail:
     msg: >
       You need to define a required configuration setting (`{{ item }}`).
@@ -20,7 +20,7 @@
 
 - when: docmost_container_labels_traefik_enabled | bool
   block:
-    - name: Fail if required Docmost Traefik settings not defined
+    - name: Fail if required Ghostfolio Traefik settings not defined
       ansible.builtin.fail:
         msg: >-
           You need to define a required configuration setting (`{{ item }}`).

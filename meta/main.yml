@@ -3,7 +3,7 @@ galaxy_info:
   company: progressiv
   role_name: docmost
   namespace: progressiv
-  description: Docmost
+  description: Ghostfolio
   platforms:
     - name: Debian
       versions:
