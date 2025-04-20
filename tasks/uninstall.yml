@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+
+- name: Check existence of Docmost systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ docmost_identifier }}.service"
+  register: docmost_service_stat
+
+- when: docmost_service_stat.stat.exists | bool
+  block:
+    - name: Ensure Docmost systemd service is stopped
+      ansible.builtin.service:
+        name: "{{ docmost_identifier }}"
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Ensure Docmost systemd service doesn't exist
+      ansible.builtin.file:
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ docmost_identifier }}.service"
+        state: absent
+
+    - name: Ensure Docmost base directory doesn't exist
+      ansible.builtin.file:
+        path: "{{ docmost_base_path }}"
+        state: absent
