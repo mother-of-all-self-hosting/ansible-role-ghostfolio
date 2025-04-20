@@ -18,11 +18,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Setting up Ghostfolio
 
-This is an [Ansible](https://www.ansible.com/) role which installs [Ghostfolio](https://ghostfolio.com/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [Ghostfolio](https://ghostfol.io/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
 Ghostfolio is an free and open-source collaborative wiki and documentation software, designed for seamless real-time collaboration. It can be used to manage a wiki, a knowledge base, project documentation, etc. It has various functions such as granular permissions management system, page history to track changes of articles, etc. It also supports diagramming tools like Draw.io, Excalidraw and Mermaid.
 
-See the project's [documentation](https://ghostfolio.com/docs/) to learn what Ghostfolio does and why it might be useful to you.
+See the project's [documentation](https://ghostfol.io/docs/) to learn what Ghostfolio does and why it might be useful to you.
 
 ## Prerequisites
 
@@ -181,7 +181,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `ghostfolio_environment_variables_additional_variables` variable
 
-For a complete list of Ghostfolio's config options that you could put in `ghostfolio_environment_variables_additional_variables`, see its [environment variables](https://ghostfolio.com/docs/self-hosting/environment-variables).
+For a complete list of Ghostfolio's config options that you could put in `ghostfolio_environment_variables_additional_variables`, see its [environment variables](https://ghostfol.io/docs/self-hosting/environment-variables).
 
 ## Installing
 

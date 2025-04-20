@@ -36,9 +36,6 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% endif %}
       --env-file={{ ghostfolio_base_path }}/env \
       --label-file={{ ghostfolio_base_path }}/labels \
-      {% if ghostfolio_data_path %}
-      --mount type=bind,src={{ ghostfolio_data_path }},dst=/app/data/storage \
-      {% endif %}
       {% for volume in ghostfolio_container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options else '' }} \
       {% endfor %}

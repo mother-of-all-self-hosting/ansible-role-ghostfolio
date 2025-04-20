@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Ghostfolio Ansible role
 
-This is an [Ansible](https://www.ansible.com/) role which installs [Ghostfolio](https://ghostfolio.com/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [Ghostfolio](https://ghostfol.io/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
 This role *implicitly* depends on:
 

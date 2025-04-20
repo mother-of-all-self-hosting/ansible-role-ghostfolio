@@ -16,7 +16,6 @@
     - ghostfolio_hostname
     - ghostfolio_path_prefix
     - ghostfolio_container_network
-    - ghostfolio_environment_variable_redis_url
 
 - when: ghostfolio_container_labels_traefik_enabled | bool
   block:

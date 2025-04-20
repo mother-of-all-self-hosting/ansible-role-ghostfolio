@@ -14,8 +14,7 @@ ghostfolio_enabled: true
 ghostfolio_identifier: ghostfolio
 ghostfolio_base_path: "{{ ghostfolio_identifier }}"
 
-# renovate: datasource=docker depName=ghostfolio/ghostfolio versioning=semver
-ghostfolio_version: 0.10.2
+ghostfolio_version: 2.153.0
 
 ghostfolio_uid: ''
 ghostfolio_gid: ''
@@ -23,7 +22,6 @@ ghostfolio_gid: ''
 # The hostname at which Ghostfolio is served.
 ghostfolio_hostname: ''
 
-# Specify URI scheme for ghostfolio_environment_variable_app_url.
 ghostfolio_scheme: https
 
 # The path at which Ghostfolio is exposed.
@@ -159,92 +157,34 @@ ghostfolio_systemd_required_services_list_custom: []
 # List of systemd services that the Ghostfolio systemd service wants
 ghostfolio_systemd_wanted_services_list: []
 
-# Specify the path for storing uploaded files on the host
-ghostfolio_data_path: ''
+# env.j2: Specify various settings
+ghostfolio_environment_variable_compose_project_name: ghostfolio
+ghostfolio_environment_variable_access_token_salt: "random-access-token-salt"
+ghostfolio_environment_variable_api_key_coingecko_demo: ""
+ghostfolio_environment_variable_api_key_coingecko_pro: ""
+ghostfolio_environment_variable_host: "0.0.0.0"
+ghostfolio_environment_variable_jwt_secret_key: "random-secret-key"
+ghostfolio_environment_variable_port: 3333
+ghostfolio_environment_variable_request_timeout: 2000
 
-# env.j2: Specify application's URL and port
-ghostfolio_environment_variable_app_url: "{{ ghostfolio_scheme }}://{{ ghostfolio_hostname }}"
-ghostfolio_environment_variable_port: 3000
-
-# env.j2: Specify application's secret (minimum of 32 characters)
-# Generate a strong secret. You can create one with a command like `pwgen -s 64 1`.
-ghostfolio_environment_variable_app_secret: YOUR_SECRET_KEY_HERE
-
-# env.j2: Specify expiration time for JSON Web Tokens (default: 30 days)
-ghostfolio_environment_variable_jwt_token_expires_in: 30d
+# env.j2: Specify log level
+# Valid values: "debug", "error", "log", "warn"
+ghostfolio_environment_variable_log_levels: ["warn"]
 
 # env.j2: Specify configuration for Postgres database server
-ghostfolio_database_username: 'postgres'
-ghostfolio_database_password: 'password'
-ghostfolio_database_hostname: 'localhost'
+ghostfolio_environment_variable_postgres_db: "ghostfolio-db"
+ghostfolio_environment_variable_postgres_user: postgres
+ghostfolio_environment_variable_postgres_password: password
+ghostfolio_database_host: postgres
 ghostfolio_database_port: 5432
-ghostfolio_database_name: 'ghostfolio'
-ghostfolio_environment_variable_database_url: "postgres://{{ ghostfolio_database_username }}:{{ ghostfolio_database_password }}@{{ ghostfolio_database_hostname }}:{{ ghostfolio_database_port }}/{{ ghostfolio_database_name }}?schema=public"
+ghostfolio_environment_variable_database_url: "postgresql://{{ ghostfolio_environment_variable_postgres_user }}:{{ ghostfolio_environment_variable_postgres_password }}@{{ ghostfolio_database_host }}:{{ ghostfolio_database_port }}/{{ ghostfolio_environment_variable_postgres_db }}?connect_timeout=300&sslmode=prefer"
 
 # env.j2: Specify configuration for Redis, KeyDB, or Valkey server
-ghostfolio_redis_username: ''
-ghostfolio_redis_password: ''
-ghostfolio_redis_host: ''
-ghostfolio_redis_port: 6379
-ghostfolio_redis_dbnumber: ''
-ghostfolio_environment_variable_redis_url: "redis://{{ ghostfolio_redis_username }}:{{ ghostfolio_redis_password }}@{{ ghostfolio_redis_host }}:{{ ghostfolio_redis_port }}/{{ ghostfolio_redis_dbnumber }}"
-
-# env.j2: Specify the storage backend option
-# Valid values: local, s3
-ghostfolio_environment_variable_storage_driver: local
-
-# env.j2: Specify S3 driver configuration
-# Set a S3 access key ID
-ghostfolio_environment_variable_aws_s3_access_key_id: ''
-# Set a S3 secret access key ID
-ghostfolio_environment_variable_aws_s3_secret_access_key: ''
-# Set the region where your S3 bucket is located
-ghostfolio_environment_variable_aws_s3_region: ''
-# Set a S3 bucket name to use
-ghostfolio_environment_variable_aws_s3_bucket: ''
-# The endpoint URL for your S3 service (optional; set if using a S3 compatible storage like Wasabi and Storj)
-ghostfolio_environment_variable_aws_s3_endpoint: ''
-# Control whether to force path style URLs (https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#s3ForcePathStyle-property) for S3 objects
-ghostfolio_environment_variable_aws_s3_force_path_style: false
-
-# env.j2: Specify the maximum uploaded file size (default: 50mb)
-ghostfolio_environment_variable_file_upload_size_limit: '50mb'
-
-# env.j2: Control whether mailer is enabled
-ghostfolio_mailer_enabled: false
-
-# env.j2: Specify the mailer's configuration
-# Valid values: smtp, postmark
-ghostfolio_environment_variable_mail_driver: smtp
-# Set the email address that emails will be sent from
-ghostfolio_environment_variable_mail_from_address: hello@example.com
-# Set the name that emails will be sent from
-ghostfolio_environment_variable_mail_from_name: ghostfolio
-
-# env.j2: Specify SMTP driver configuration
-# Set the hostname of the SMTP server
-ghostfolio_environment_variable_smtp_host: 127.0.0.1
-# Set the port to use for the SMTP server
-ghostfolio_environment_variable_smtp_port: 587
-# Set the username for the SMTP server
-ghostfolio_environment_variable_smtp_username: ''
-# Set the password for the SMTP server
-ghostfolio_environment_variable_smtp_password: ''
-# Control whether TLS is used when connecting to the server
-ghostfolio_environment_variable_smtp_secure: false
-# Control whether SSL errors are ignored
-ghostfolio_environment_variable_smtp_ignoretls: false
-
-# env.j2: Specify Postmark driver configuration
-ghostfolio_environment_variable_postmark_token: ''
-
-# env.j2: Specify custom Draw.io server configuration
-# Example: https://embed.diagrams.net
-ghostfolio_environment_variable_drawio_url: ''
-
-# env.j2: Control whether telemetry is disabled
-ghostfolio_environment_variable_disable_telemetry: false
+ghostfolio_environment_variable_redis_db: 0
+ghostfolio_environment_variable_redis_host: "redis"
+ghostfolio_environment_variable_redis_password: ""
+ghostfolio_environment_variable_redis_port: 6379
 
 # Additional environment variables.
-# See: https://ghostfolio.com/docs/self-hosting/environment-variables
+# See: https://github.com/ghostfolio/ghostfolio/blob/main/README.md#supported-environment-variables
 ghostfolio_environment_variables_additional_variables: ''
