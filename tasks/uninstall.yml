@@ -7,24 +7,24 @@
 
 - name: Check existence of Ghostfolio systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ docmost_identifier }}.service"
-  register: docmost_service_stat
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ ghostfolio_identifier }}.service"
+  register: ghostfolio_service_stat
 
-- when: docmost_service_stat.stat.exists | bool
+- when: ghostfolio_service_stat.stat.exists | bool
   block:
     - name: Ensure Ghostfolio systemd service is stopped
       ansible.builtin.service:
-        name: "{{ docmost_identifier }}"
+        name: "{{ ghostfolio_identifier }}"
         state: stopped
         enabled: false
         daemon_reload: true
 
     - name: Ensure Ghostfolio systemd service doesn't exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ docmost_identifier }}.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ ghostfolio_identifier }}.service"
         state: absent
 
     - name: Ensure Ghostfolio base directory doesn't exist
       ansible.builtin.file:
-        path: "{{ docmost_base_path }}"
+        path: "{{ ghostfolio_base_path }}"
         state: absent

@@ -6,21 +6,21 @@
 ---
 
 - block:
-    - when: docmost_enabled | bool
+    - when: ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
 
-    - when: docmost_enabled | bool
+    - when: ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
   tags:
     - setup-all
-    - setup-docmost
+    - setup-ghostfolio
     - install-all
-    - install-docmost
+    - install-ghostfolio
 
 - block:
-    - when: not docmost_enabled | bool
+    - when: not ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
   tags:
     - setup-all
-    - setup-docmost
+    - setup-ghostfolio
