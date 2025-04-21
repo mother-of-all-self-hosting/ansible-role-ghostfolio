@@ -66,113 +66,49 @@ After adjusting the hostname, make sure to adjust your DNS records to point the 
 
 **Note**: hosting Ghostfolio under a subpath (by configuring the `ghostfolio_path_prefix` variable) does not seem to be possible due to Ghostfolio's technical limitations.
 
-### Set variables for connecting to a Redis server
+### Set access token salt and JWT secret key
 
-As described above, it is necessary to set up a [Redis](https://redis.io/) server for managing a metadata database of a Ghostfolio instance. You can use either KeyDB or Valkey alternatively.
+You also need to set random strings to salt for access token and JWT secret key. They can be generated with `pwgen -s 64 1` or in another way.
+
+```yaml
+ghostfolio_environment_variable_access_token_salt: RANDOM_ACCESS_TOKEN_SALT_HERE
+ghostfolio_environment_variable_jwt_secret_key: RANDOM_SECRET_KEY_HERE
+```
+
+### Set variables for connecting to a Postgres database server
+
+To use a Postgres server, add the following configuration to your `vars.yml` file.
+
+```yaml
+ghostfolio_environment_variable_postgres_user: YOUR_POSTGRES_SERVER_USERNAME_HERE
+ghostfolio_environment_variable_postgres_password: YOUR_POSTGRES_SERVER_PASSWORD_HERE
+ghostfolio_database_host: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
+ghostfolio_database_port: 5432
+```
+
+Make sure to replace `YOUR_POSTGRES_SERVER_USERNAME_HERE`, `YOUR_POSTGRES_SERVER_PASSWORD_HERE`, and `YOUR_POSTGRES_SERVER_HOSTNAME_HERE` with your own values.
+
+### Set variables for connecting to a Redis cache server
+
+As described above, it is also necessary to set up a [Redis](https://redis.io/) server for managing a metadata database of a Ghostfolio instance. You can use either KeyDB or Valkey alternatively.
 
 Having configured it, you need to add and adjust the following configuration to your `vars.yml` file, so that the Ghostfolio instance will connect to the server:
 
 ```yaml
-ghostfolio_redis_username: ''
-ghostfolio_redis_password: ''
-ghostfolio_redis_host: YOUR_REDIS_SERVER_HOSTNAME_HERE
-ghostfolio_redis_port: 6379
-ghostfolio_redis_dbnumber: ''
+ghostfolio_environment_variable_redis_host: YOUR_REDIS_SERVER_HOSTNAME_HERE
+ghostfolio_environment_variable_redis_password: YOUR_REDIS_SERVER_PASSWORD_HERE
+ghostfolio_environment_variable_redis_port: 6379
 ```
 
-Make sure to replace `YOUR_REDIS_SERVER_HOSTNAME_HERE` with the hostname of your Redis server. If the Redis server runs on the same host as Ghostfolio, set `localhost`.
+Make sure to replace `YOUR_REDIS_SERVER_HOSTNAME_HERE` and `YOUR_REDIS_SERVER_PASSWORD_HERE` with your own values.
 
-### Configure a storage backend
+### Set Coingecko API keys (optional)
 
-The service provides these storage backend options: local filesystem (default) and Amazon S3 compatible object storage.
-
-#### Local filesystem (default)
-
-**By default this role removes uploaded files when uninstalling the service**. In order to make those files persistent, you need to add a Docker volume to mount in the container, so that the directory for storing files is shared with the host machine.
-
-To add the volume, prepare a directory on the host machine and add the following configuration to your `vars.yml` file:
+If you have either or both of *CoinGecko* Demo API key and *CoinGecko* Pro API key, you can specify them by adding the following configuration to your `vars.yml` file:
 
 ```yaml
-ghostfolio_data_path: /path/on/the/host
-```
-
-Make sure permissions of the directory specified to `/path/on/the/host`.
-
-#### Amazon S3 compatible object storage
-
-To use Amazon S3 or a S3 compatible object storage, add the following configuration to your `vars.yml` file (adapt to your needs):
-
-```yaml
-ghostfolio_environment_variable_storage_driver: s3
-
-# Set a S3 access key ID
-ghostfolio_environment_variable_aws_s3_access_key_id: ''
-
-# Set a S3 secret access key ID
-ghostfolio_environment_variable_aws_s3_secret_access_key: ''
-
-# Set the the region where your S3 bucket is located
-ghostfolio_environment_variable_aws_s3_region: ''
-
-# Set a S3 bucket name to use
-ghostfolio_environment_variable_aws_s3_bucket: ''
-
-# The endpoint URL for your S3 service (optional; set if using a S3 compatible storage like Wasabi and Storj)
-ghostfolio_environment_variable_aws_s3_endpoint: ''
-
-# Control whether to force path style URLs (https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#s3ForcePathStyle-property) for S3 objects
-ghostfolio_environment_variable_aws_s3_force_path_style: false
-```
-
-### Configure the mailer
-
-You can configure a mailer for functions such as user invitation. Ghostfolio supports a SMTP server (default) and Postmark. To set it up, add the following common configuration and settings specific to SMTP server or Postmark to your `vars.yml` file as below (adapt to your needs):
-
-```yaml
-ghostfolio_mailer_enabled: true
-
-# Set the email address that emails will be sent from
-ghostfolio_environment_variable_mail_from_address: hello@example.com
-
-# Set the name that emails will be sent from
-ghostfolio_environment_variable_mail_from_name: ghostfolio
-```
-
-#### Use SMTP server (default)
-
-To use a SMTP server, add the following configuration to your `vars.yml` file:
-
-```yaml
-# Set the hostname of the SMTP server
-ghostfolio_environment_variable_smtp_host: 127.0.0.1
-
-# Set the port to use for the SMTP server
-ghostfolio_environment_variable_smtp_port: 587
-
-# Set the username for the SMTP server
-ghostfolio_environment_variable_smtp_username: ''
-
-# Set the password for the SMTP server
-ghostfolio_environment_variable_smtp_password: ''
-
-# Control whether TLS is used when connecting to the server
-ghostfolio_environment_variable_smtp_secure: false
-
-# Control whether SSL errors are ignored
-ghostfolio_environment_variable_smtp_ignoretls: false
-```
-
-⚠️ **Note**: without setting an authentication method such as DKIM, SPF, and DMARC for your hostname, emails are most likely to be quarantined as spam at recipient's mail servers. If you have set up a mail server with the [MASH project's exim-relay Ansible role](https://github.com/mother-of-all-self-hosting/ansible-role-exim-relay), you can enable DKIM signing with it. Refer [its documentation](https://github.com/mother-of-all-self-hosting/ansible-role-exim-relay/blob/main/docs/configuring-exim-relay.md#enable-dkim-support-optional) for details.
-
-#### Use Postmark
-
-To use Postmark, add the following configuration to your `vars.yml` file:
-
-```yaml
-ghostfolio_environment_variable_mail_driver: postmark
-
-# Set the token for Postmark
-ghostfolio_environment_variable_postmark_token: ''
+ghostfolio_environment_variable_api_key_coingecko_demo: YOUR_DEMO_KEY_HERE
+ghostfolio_environment_variable_api_key_coingecko_pro: YOUR_PRO_KEY_HERE
 ```
 
 ### Extending the configuration
