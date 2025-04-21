@@ -20,9 +20,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 This is an [Ansible](https://www.ansible.com/) role which installs [Ghostfolio](https://ghostfol.io/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-Ghostfolio is an free and open-source collaborative wiki and documentation software, designed for seamless real-time collaboration. It can be used to manage a wiki, a knowledge base, project documentation, etc. It has various functions such as granular permissions management system, page history to track changes of articles, etc. It also supports diagramming tools like Draw.io, Excalidraw and Mermaid.
+Ghostfolio is a free software for wealth management to keep track of assets such as stocks and ETFs.
 
-See the project's [documentation](https://ghostfol.io/docs/) to learn what Ghostfolio does and why it might be useful to you.
+See the project's [documentation](https://ghostfol.io/en/features) to learn what Ghostfolio does and why it might be useful to you.
 
 ## Prerequisites
 
