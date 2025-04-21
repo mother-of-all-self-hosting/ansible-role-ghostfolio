@@ -20,15 +20,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 This is an [Ansible](https://www.ansible.com/) role which installs [Ghostfolio](https://ghostfol.io/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-Ghostfolio is a free software for wealth management to keep track of assets such as stocks and ETFs.
+Ghostfolio is a free software for wealth management to keep track of assets such as stocks, bonds, ETFs, etc.
 
 See the project's [documentation](https://ghostfol.io/en/features) to learn what Ghostfolio does and why it might be useful to you.
 
 ## Prerequisites
 
-To run a Ghostfolio instance it is necessary to prepare a [Redis](https://redis.io/) server for managing a metadata database.
+To run a Ghostfolio instance it is necessary to prepare a [Postgres](https://redis.io/) database server and [Redis](https://redis.io/) server for managing cache data.
 
-If you are looking for an Ansible role for Redis, you can check out [this role (ansible-role-redis)](https://github.com/mother-of-all-self-hosting/ansible-role-redis) maintained by the [Mother-of-All-Self-Hosting (MASH)](https://github.com/mother-of-all-self-hosting) team. Note that the team recommends to have a look at [this role (ansible-role-valkey)](https://github.com/mother-of-all-self-hosting/ansible-role-valkey) for [Valkey](https://valkey.io/) instead.
+If you are looking for Ansible roles for them, you can check out [ansible-role-postgres](https://github.com/mother-of-all-self-hosting/ansible-role-postgres) and [ansible-role-redis](https://github.com/mother-of-all-self-hosting/ansible-role-redis), both of which are maintained by the [Mother-of-All-Self-Hosting (MASH)](https://github.com/mother-of-all-self-hosting) team. Note that the team recommends to have a look at [this role (ansible-role-valkey)](https://github.com/mother-of-all-self-hosting/ansible-role-valkey) for [Valkey](https://valkey.io/) instead of ansible-role-redis.
+
+See [here](https://github.com/ghostfolio/ghostfolio/blob/main/README.md#technology-stack) on the official documentation to check server requirements.
 
 ## Adjusting the playbook configuration
 
