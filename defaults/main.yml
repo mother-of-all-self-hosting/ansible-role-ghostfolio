@@ -12,7 +12,7 @@
 ghostfolio_enabled: true
 
 ghostfolio_identifier: ghostfolio
-ghostfolio_base_path: "{{ ghostfolio_identifier }}"
+ghostfolio_base_path: "/{{ ghostfolio_identifier }}"
 
 # renovate: datasource=docker depName=ghostfolio/ghostfolio versioning=semver
 ghostfolio_version: 2.156.0
