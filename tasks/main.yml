@@ -4,8 +4,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: Perform Ghostfolio installation tasks
+  tags:
+    - setup-all
+    - setup-ghostfolio
+    - install-all
+    - install-ghostfolio
+
   block:
     - name: Validate Ghostfolio configuration
       when: ghostfolio_enabled | bool
@@ -14,17 +19,12 @@
     - name: Install Ghostfolio
       when: ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
+
+- name: Perform Ghostfolio uninstallation tasks
   tags:
     - setup-all
     - setup-ghostfolio
-    - install-all
-    - install-ghostfolio
-
-- name: Perform Ghostfolio uninstallation tasks
   block:
     - name: Uninstall Ghostfolio
       when: not ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
-  tags:
-    - setup-all
-    - setup-ghostfolio
