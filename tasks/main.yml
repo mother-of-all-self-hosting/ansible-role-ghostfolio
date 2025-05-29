@@ -10,12 +10,10 @@
     - setup-ghostfolio
     - install-all
     - install-ghostfolio
-
   block:
     - name: Validate Ghostfolio configuration
       when: ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
-
     - name: Install Ghostfolio
       when: ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
