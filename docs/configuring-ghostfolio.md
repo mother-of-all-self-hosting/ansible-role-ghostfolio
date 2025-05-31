@@ -30,7 +30,7 @@ To run a Ghostfolio instance it is necessary to prepare a [Postgres](https://red
 
 If you are looking for Ansible roles for them, you can check out [ansible-role-postgres](https://github.com/mother-of-all-self-hosting/ansible-role-postgres) and [ansible-role-redis](https://github.com/mother-of-all-self-hosting/ansible-role-redis), both of which are maintained by the [Mother-of-All-Self-Hosting (MASH)](https://github.com/mother-of-all-self-hosting) team. Note that the team recommends to have a look at [this role (ansible-role-valkey)](https://github.com/mother-of-all-self-hosting/ansible-role-valkey) for [Valkey](https://valkey.io/) instead of ansible-role-redis.
 
-See [here](https://github.com/ghostfolio/ghostfolio/blob/main/README.md#technology-stack) on the official documentation to check server requirements.
+See [this section](https://github.com/ghostfolio/ghostfolio/blob/main/README.md#technology-stack) on the official documentation to check server requirements.
 
 ## Adjusting the playbook configuration
 
