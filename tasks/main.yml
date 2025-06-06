@@ -5,6 +5,7 @@
 
 ---
 - name: Perform Ghostfolio installation tasks
+  when: ghostfolio_enabled | bool
   tags:
     - setup-all
     - setup-ghostfolio
@@ -12,17 +13,15 @@
     - install-ghostfolio
   block:
     - name: Validate Ghostfolio configuration
-      when: ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
     - name: Install Ghostfolio
-      when: ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
 - name: Perform Ghostfolio uninstallation tasks
+  when: not ghostfolio_enabled | bool
   tags:
     - setup-all
     - setup-ghostfolio
   block:
     - name: Uninstall Ghostfolio
-      when: not ghostfolio_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
