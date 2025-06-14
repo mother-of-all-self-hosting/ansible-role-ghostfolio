@@ -41,7 +41,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% for arg in ghostfolio_container_extra_arguments %}
       {{ arg }} \
       {% endfor %}
-      {{ ghostfolio_container_image }}
+      {{ ghostfolio_container_image_self_build_name if ghostfolio_container_image_self_build else ghostfolio_container_image }}
 
 {% for network in ghostfolio_container_additional_networks %}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ ghostfolio_identifier }}
