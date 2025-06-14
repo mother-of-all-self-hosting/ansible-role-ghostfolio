@@ -40,9 +40,10 @@ ghostfolio_container_image_registry_prefix_upstream_default: docker.io/
 ghostfolio_container_image_force_pull: "{{ ghostfolio_container_image.endswith(':latest') }}"
 
 ghostfolio_container_image_self_build: false
-ghostfolio_container_repo: "https://github.com/ghostfolio/ghostfolio.git"
-ghostfolio_container_repo_version: "{{ ghostfolio_version if ghostfolio_version != 'latest' else 'main' }}"
-ghostfolio_container_src_files_path: "{{ ghostfolio_base_path }}/docker-src"
+ghostfolio_container_image_self_build_name: "ghostfolio/ghostfolio:{{ ghostfolio_container_image_self_build_repo_version }}"
+ghostfolio_container_image_self_build_repo: "https://github.com/ghostfolio/ghostfolio.git"
+ghostfolio_container_image_self_build_repo_version: "{{ ghostfolio_version if ghostfolio_version != 'latest' else 'main' }}"
+ghostfolio_container_image_self_build_src_files_path: "{{ ghostfolio_base_path }}/docker-src"
 ghostfolio_container_image_self_build_environment_buildplatform: linux/amd64
 
 # Controls whether the container exposes its HTTP port (tcp/80 in the container).
