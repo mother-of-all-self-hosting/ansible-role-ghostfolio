@@ -119,7 +119,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `ghostfolio_environment_variables_additional_variables` variable
 
-For a complete list of Ghostfolio's config options that you could put in `ghostfolio_environment_variables_additional_variables`, see its [environment variables](https://ghostfol.io/docs/self-hosting/environment-variables).
+See its [environment variables](https://ghostfol.io/docs/self-hosting/environment-variables) for a complete list of Ghostfolio's config options that you could put in `ghostfolio_environment_variables_additional_variables`.
 
 ## Installing
 
