@@ -183,9 +183,9 @@ ghostfolio_environment_variable_log_levels: ["warn"]
 ghostfolio_environment_variable_postgres_db: "ghostfolio-db"
 ghostfolio_environment_variable_postgres_user: postgres
 ghostfolio_environment_variable_postgres_password: password
-ghostfolio_database_host: postgres
+ghostfolio_database_hostname: postgres
 ghostfolio_database_port: 5432
-ghostfolio_environment_variable_database_url: "postgresql://{{ ghostfolio_environment_variable_postgres_user }}:{{ ghostfolio_environment_variable_postgres_password }}@{{ ghostfolio_database_host }}:{{ ghostfolio_database_port }}/{{ ghostfolio_environment_variable_postgres_db }}?connect_timeout=300&sslmode=prefer"
+ghostfolio_environment_variable_database_url: "postgresql://{{ ghostfolio_environment_variable_postgres_user }}:{{ ghostfolio_environment_variable_postgres_password }}@{{ ghostfolio_database_hostname }}:{{ ghostfolio_database_port }}/{{ ghostfolio_environment_variable_postgres_db }}?connect_timeout=300&sslmode=prefer"
 
 # env.j2: Specify configuration for Redis, KeyDB, or Valkey server
 ghostfolio_environment_variable_redis_db: 0
