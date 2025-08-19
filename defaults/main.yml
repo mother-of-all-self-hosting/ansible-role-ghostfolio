@@ -197,7 +197,7 @@ ghostfolio_environment_variable_database_url: "postgresql://{{ ghostfolio_enviro
 
 # env.j2: Specify configuration for Redis, KeyDB, or Valkey server
 ghostfolio_environment_variable_redis_db: 0
-ghostfolio_environment_variable_redis_host: "redis"
+ghostfolio_environment_variable_redis_hostname: "redis"
 ghostfolio_environment_variable_redis_password: ""
 ghostfolio_environment_variable_redis_port: 6379
 

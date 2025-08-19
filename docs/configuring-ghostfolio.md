@@ -95,7 +95,7 @@ As described above, it is also necessary to set up a [Redis](https://redis.io/) 
 Having configured it, you need to add and adjust the following configuration to your `vars.yml` file, so that the Ghostfolio instance will connect to the server:
 
 ```yaml
-ghostfolio_environment_variable_redis_host: YOUR_REDIS_SERVER_HOSTNAME_HERE
+ghostfolio_environment_variable_redis_hostname: YOUR_REDIS_SERVER_HOSTNAME_HERE
 ghostfolio_environment_variable_redis_password: YOUR_REDIS_SERVER_PASSWORD_HERE
 ghostfolio_environment_variable_redis_port: 6379
 ```
