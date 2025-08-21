@@ -135,7 +135,7 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 
 After running the command for installation, Ghostfolio becomes available at the specified hostname like `https://example.com`.
 
-To use it, go to `https://example.com/en/register` on a web browser and create a first user by clicking the "Create Account" button. **Note that the first user will be an administrator of the instance.**
+To use it, open the URL `https://example.com/en/register` on a web browser and create a first user by clicking the "Create Account" button. **Note that the first user will be an administrator of the instance.**
 
 After creating the user and logging in to the instance, you can add bank and brokerage accounts by following the instruction on the UI.
 
