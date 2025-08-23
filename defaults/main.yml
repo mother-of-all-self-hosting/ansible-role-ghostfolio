@@ -171,7 +171,10 @@ ghostfolio_systemd_required_services_list_auto: []
 ghostfolio_systemd_required_services_list_custom: []
 
 # List of systemd services that the Ghostfolio systemd service wants
-ghostfolio_systemd_wanted_services_list: []
+ghostfolio_systemd_wanted_services_list: "{{ ghostfolio_systemd_wanted_services_list_default + ghostfolio_systemd_wanted_services_list_auto + ghostfolio_systemd_wanted_services_list_custom }}"
+ghostfolio_systemd_wanted_services_list_default: []
+ghostfolio_systemd_wanted_services_list_auto: []
+ghostfolio_systemd_wanted_services_list_custom: []
 
 # env.j2: Specify various settings
 ghostfolio_environment_variable_compose_project_name: ghostfolio
