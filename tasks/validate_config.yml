@@ -26,6 +26,12 @@
     - ghostfolio_path_prefix
     - ghostfolio_container_network
 
+- name: Fail if Ghostfolio logging level is invalid
+  ansible.builtin.fail:
+    msg: >-
+      ghostfolio_environment_variable_log_levels must be 'debug', 'error', 'log', or 'warn'
+  when: "ghostfolio_environment_variable_log_levels not in ['debug', 'error', 'log', 'warn']"
+
 - name: Run if Traefik is enabled
   when: ghostfolio_container_labels_traefik_enabled | bool
   block:
