@@ -12,7 +12,10 @@
   when: "lookup('ansible.builtin.varnames', ('^' + item.old + '$'), wantlist=True) | length > 0"
   with_items:
     - { "old": "ghostfolio_database_host", "new": "ghostfolio_database_hostname" }
-    - { "old": "ghostfolio_environment_variable_redis_host", "new": "ghostfolio_environment_variable_redis_hostname" }
+    - { "old": "ghostfolio_redis_host", "new": "ghostfolio_redis_hostname" }
+    - { "old": "ghostfolio_environment_variable_redis_port", "new": "ghostfolio_redis_port" }
+    - { "old": "ghostfolio_environment_variable_redis_password", "new": "ghostfolio_redis_password" }
+    - { "old": "ghostfolio_environment_variable_redis_db", "new": "ghostfolio_redis_db" }
 
 - name: Fail if required Ghostfolio settings not defined
   ansible.builtin.fail:
