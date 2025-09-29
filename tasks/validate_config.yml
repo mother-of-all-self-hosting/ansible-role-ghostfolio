@@ -12,6 +12,9 @@
   when: "lookup('ansible.builtin.varnames', ('^' + item.old + '$'), wantlist=True) | length > 0"
   with_items:
     - { "old": "ghostfolio_database_host", "new": "ghostfolio_database_hostname" }
+    - { "old": "ghostfolio_environment_variable_postgres_user", "new": "ghostfolio_database_username" }
+    - { "old": "ghostfolio_environment_variable_postgres_password", "new": "ghostfolio_database_password" }
+    - { "old": "ghostfolio_environment_variable_postgres_db", "new": "ghostfolio_database_name" }
     - { "old": "ghostfolio_redis_host", "new": "ghostfolio_redis_hostname" }
     - { "old": "ghostfolio_environment_variable_redis_port", "new": "ghostfolio_redis_port" }
     - { "old": "ghostfolio_environment_variable_redis_password", "new": "ghostfolio_redis_password" }

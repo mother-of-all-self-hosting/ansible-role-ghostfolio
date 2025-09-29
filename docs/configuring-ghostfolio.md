@@ -80,8 +80,8 @@ ghostfolio_environment_variable_jwt_secret_key: RANDOM_SECRET_KEY_HERE
 To use a Postgres server, add the following configuration to your `vars.yml` file.
 
 ```yaml
-ghostfolio_environment_variable_postgres_user: YOUR_POSTGRES_SERVER_USERNAME_HERE
-ghostfolio_environment_variable_postgres_password: YOUR_POSTGRES_SERVER_PASSWORD_HERE
+ghostfolio_database_username: YOUR_POSTGRES_SERVER_USERNAME_HERE
+ghostfolio_database_password: YOUR_POSTGRES_SERVER_PASSWORD_HERE
 ghostfolio_database_hostname: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
 ghostfolio_database_port: 5432
 ```
