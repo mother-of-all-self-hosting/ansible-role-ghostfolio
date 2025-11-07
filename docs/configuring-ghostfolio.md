@@ -56,7 +56,7 @@ ghostfolio_enabled: true
 
 ### Set the hostname
 
-To enable the Ghostfolio you need to set the hostname as well. To do so, add the following configuration to your `vars.yml` file. Make sure to replace `example.com` with your own value.
+To enable the Ghostfolio instance you need to set the hostname as well. To do so, add the following configuration to your `vars.yml` file. Make sure to replace `example.com` with your own value.
 
 ```yaml
 ghostfolio_hostname: "example.com"
