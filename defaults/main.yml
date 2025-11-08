@@ -17,11 +17,11 @@ ghostfolio_base_path: "/{{ ghostfolio_identifier }}"
 # renovate: datasource=docker depName=ghostfolio/ghostfolio versioning=semver
 ghostfolio_version: 2.215.0
 
-ghostfolio_uid: ''
-ghostfolio_gid: ''
+ghostfolio_uid: ""
+ghostfolio_gid: ""
 
 # The hostname at which Ghostfolio is served.
-ghostfolio_hostname: ''
+ghostfolio_hostname: ""
 
 ghostfolio_scheme: https
 
@@ -49,7 +49,7 @@ ghostfolio_container_image_self_build_environment_buildplatform: linux/amd64
 # Controls whether the container exposes its HTTP port (tcp/80 in the container).
 #
 # Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:2586"), or empty string to not expose.
-ghostfolio_container_http_host_bind_port: ''
+ghostfolio_container_http_host_bind_port: ""
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 ghostfolio_container_network: "{{ ghostfolio_identifier }}"
@@ -112,7 +112,7 @@ ghostfolio_container_labels_traefik_additional_response_headers_custom: {}
 # ghostfolio_container_labels_additional_labels: |
 #   my.label=1
 #   another.label="here"
-ghostfolio_container_labels_additional_labels: ''
+ghostfolio_container_labels_additional_labels: ""
 
 # A list of extra arguments to pass to the container (`docker run` command)
 ghostfolio_container_extra_arguments: []
@@ -206,4 +206,4 @@ ghostfolio_redis_db: 0
 
 # Additional environment variables.
 # See: https://github.com/ghostfolio/ghostfolio/blob/main/README.md#supported-environment-variables
-ghostfolio_environment_variables_additional_variables: ''
+ghostfolio_environment_variables_additional_variables: ""
