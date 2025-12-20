@@ -107,9 +107,10 @@ ghostfolio_container_labels_traefik_additional_response_headers_custom: {}
 
 # ghostfolio_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
 # See `../templates/labels.j2` for details.
+# To add your own custom labels, use `ghostfolio_container_labels_additional_labels_custom`
 #
 # Example:
-# ghostfolio_container_labels_additional_labels: |
+# ghostfolio_container_labels_additional_labels_custom: |
 #   my.label=1
 #   another.label="here"
 ghostfolio_container_labels_additional_labels: "{{ ghostfolio_container_labels_additional_labels_auto | combine(ghostfolio_container_labels_additional_labels_custom) }}"
