@@ -176,20 +176,6 @@ ghostfolio_systemd_wanted_services_list_default: []
 ghostfolio_systemd_wanted_services_list_auto: []
 ghostfolio_systemd_wanted_services_list_custom: []
 
-# env.j2: Specify various settings
-ghostfolio_environment_variable_compose_project_name: ghostfolio
-ghostfolio_environment_variable_access_token_salt: "random-access-token-salt"
-ghostfolio_environment_variable_api_key_coingecko_demo: ""
-ghostfolio_environment_variable_api_key_coingecko_pro: ""
-ghostfolio_environment_variable_host: "0.0.0.0"
-ghostfolio_environment_variable_jwt_secret_key: "random-secret-key"
-ghostfolio_environment_variable_port: 3333
-ghostfolio_environment_variable_request_timeout: 2000
-
-# env.j2: Specify log level
-# Valid values: "debug", "error", "log", "warn"
-ghostfolio_environment_variable_log_levels: ["warn"]
-
 # env.j2: Specify configuration for Postgres database server
 ghostfolio_database_hostname: postgres
 ghostfolio_database_port: 5432
@@ -203,6 +189,23 @@ ghostfolio_redis_hostname: "redis"
 ghostfolio_redis_port: 6379
 ghostfolio_redis_password: ""
 ghostfolio_redis_db: 0
+
+# Specify the timezone
+ghostfolio_environment_variables_tz: UTC
+
+# env.j2: Specify various settings
+ghostfolio_environment_variable_compose_project_name: ghostfolio
+ghostfolio_environment_variable_access_token_salt: "random-access-token-salt"
+ghostfolio_environment_variable_api_key_coingecko_demo: ""
+ghostfolio_environment_variable_api_key_coingecko_pro: ""
+ghostfolio_environment_variable_host: "0.0.0.0"
+ghostfolio_environment_variable_jwt_secret_key: "random-secret-key"
+ghostfolio_environment_variable_port: 3333
+ghostfolio_environment_variable_request_timeout: 2000
+
+# env.j2: Specify log level
+# Valid values: "debug", "error", "log", "warn"
+ghostfolio_environment_variable_log_levels: ["warn"]
 
 # Additional environment variables.
 # See: https://github.com/ghostfolio/ghostfolio/blob/main/README.md#supported-environment-variables
