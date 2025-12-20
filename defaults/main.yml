@@ -115,7 +115,9 @@ ghostfolio_container_labels_traefik_additional_response_headers_custom: {}
 ghostfolio_container_labels_additional_labels: ""
 
 # A list of extra arguments to pass to the container (`docker run` command)
-ghostfolio_container_extra_arguments: []
+ghostfolio_container_extra_arguments: "{{ ghostfolio_container_extra_arguments_auto + ghostfolio_container_extra_arguments_custom }}"
+ghostfolio_container_extra_arguments_auto: []
+ghostfolio_container_extra_arguments_custom: []
 
 # Specifies the value of the `X-XSS-Protection` header
 # Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
