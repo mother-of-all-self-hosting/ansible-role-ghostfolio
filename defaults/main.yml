@@ -25,7 +25,7 @@ ghostfolio_hostname: ""
 
 ghostfolio_scheme: https
 
-# The path at which Ghostfolio is exposed.
+# The path at which Ghostfolio is served.
 # This value must either be `/` or not end with a slash (e.g. `/ghostfolio`).
 #
 # Hosting Ghostfolio under a subpath does not seem to be possible due to Ghostfolio's
