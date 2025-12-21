@@ -117,7 +117,7 @@ ghostfolio_container_labels_additional_labels: "{{ ghostfolio_container_labels_a
 ghostfolio_container_labels_additional_labels_auto: {}
 ghostfolio_container_labels_additional_labels_custom: {}
 
-# A list of extra arguments to pass to the container (`docker run` command)
+# A list of extra arguments to pass to the container (`docker create` command)
 ghostfolio_container_extra_arguments: "{{ ghostfolio_container_extra_arguments_auto + ghostfolio_container_extra_arguments_custom }}"
 ghostfolio_container_extra_arguments_auto: []
 ghostfolio_container_extra_arguments_custom: []
