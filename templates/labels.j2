@@ -56,4 +56,6 @@ traefik.http.routers.{{ ghostfolio_identifier }}.tls.certResolver={{ ghostfolio_
 traefik.http.services.{{ ghostfolio_identifier }}.loadbalancer.server.port={{ ghostfolio_environment_variable_port }}
 {% endif %}
 
-{{ ghostfolio_container_labels_additional_labels }}
+{% for arg in ghostfolio_container_labels_additional_labels %}
+{{ arg }}
+{% endfor %}
