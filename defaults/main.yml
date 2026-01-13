@@ -20,10 +20,11 @@ ghostfolio_version: 2.228.0
 ghostfolio_uid: ""
 ghostfolio_gid: ""
 
+# The scheme used for serving Ghostfolio.
+ghostfolio_scheme: https
+
 # The hostname at which Ghostfolio is served.
 ghostfolio_hostname: ""
-
-ghostfolio_scheme: https
 
 # The path at which Ghostfolio is served.
 # This value must either be `/` or not end with a slash (e.g. `/ghostfolio`).
