@@ -31,7 +31,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --cap-drop=ALL \
       --network={{ ghostfolio_container_network }} \
       {% if ghostfolio_container_http_host_bind_port %}
-      -p {{ ghostfolio_container_http_host_bind_port }}:{{ ghostfolio_environment_variable_port }} \
+      -p {{ ghostfolio_container_http_host_bind_port }}:{{ ghostfolio_container_http_port }} \
       {% endif %}
       --env-file={{ ghostfolio_base_path }}/env \
       --label-file={{ ghostfolio_base_path }}/labels \

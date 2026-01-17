@@ -53,7 +53,7 @@ traefik.http.routers.{{ ghostfolio_identifier }}.tls={{ ghostfolio_container_lab
 traefik.http.routers.{{ ghostfolio_identifier }}.tls.certResolver={{ ghostfolio_container_labels_traefik_tls_certResolver }}
 {% endif %}
 
-traefik.http.services.{{ ghostfolio_identifier }}.loadbalancer.server.port={{ ghostfolio_environment_variable_port }}
+traefik.http.services.{{ ghostfolio_identifier }}.loadbalancer.server.port={{ ghostfolio_container_http_port }}
 {% endif %}
 
 {% for arg in ghostfolio_container_labels_additional_labels %}

@@ -50,10 +50,13 @@ ghostfolio_container_image_self_build_environment_buildplatform: linux/amd64
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 ghostfolio_container_network: "{{ ghostfolio_identifier }}"
 
-# Controls whether the container exposes its HTTP port (tcp/80 in the container).
+# Specify how the container publishes its HTTP port (as defined by `ghostfolio_container_http_port`).
 #
 # Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:2586"), or empty string to not expose.
 ghostfolio_container_http_host_bind_port: ""
+
+# The port number in the container
+ghostfolio_container_http_port: 3333
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
@@ -206,7 +209,6 @@ ghostfolio_environment_variable_api_key_coingecko_demo: ""
 ghostfolio_environment_variable_api_key_coingecko_pro: ""
 ghostfolio_environment_variable_host: "0.0.0.0"
 ghostfolio_environment_variable_jwt_secret_key: "random-secret-key"
-ghostfolio_environment_variable_port: 3333
 ghostfolio_environment_variable_request_timeout: 2000
 
 # env.j2: Specify log level
