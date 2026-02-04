@@ -113,7 +113,7 @@ ghostfolio_environment_variable_api_key_coingecko_pro: YOUR_PRO_KEY_HERE
 
 ### Extending the configuration
 
-There are some additional things you may wish to configure about the component.
+There are some additional things you may wish to configure about the service.
 
 Take a look at:
 
