@@ -33,6 +33,11 @@
     - ghostfolio_hostname
     - ghostfolio_path_prefix
     - ghostfolio_container_network
+    - ghostfolio_database_hostname
+    - ghostfolio_database_password
+    - ghostfolio_redis_hostname
+    - ghostfolio_environment_variable_access_token_salt
+    - ghostfolio_environment_variable_jwt_secret_key
 
 - name: Fail if Ghostfolio logging level is invalid
   ansible.builtin.fail:
