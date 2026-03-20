@@ -225,7 +225,11 @@ ghostfolio_database_port: 5432
 ghostfolio_database_username: postgres
 ghostfolio_database_password: ""
 ghostfolio_database_name: "ghostfolio-db"
-ghostfolio_environment_variable_database_url: "postgresql://{{ ghostfolio_database_username }}:{{ ghostfolio_database_password }}@{{ ghostfolio_database_hostname }}:{{ ghostfolio_database_port }}/{{ ghostfolio_database_name }}?connect_timeout=300&sslmode=prefer"
+# Specify SSL mode for Postgres database server
+# By default, we expect a local container (without SSL), so attempting SSL connections is not necessary.
+# Valid values: see https://www.postgresql.org/docs/11/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS
+ghostfolio_database_sslmode: disable
+ghostfolio_environment_variable_database_url: "postgresql://{{ ghostfolio_database_username }}:{{ ghostfolio_database_password }}@{{ ghostfolio_database_hostname }}:{{ ghostfolio_database_port }}/{{ ghostfolio_database_name }}?connect_timeout=300&sslmode={{ ghostfolio_database_sslmode }}"
 
 # Specify configuration for Redis, KeyDB, or Valkey server
 ghostfolio_redis_hostname: ""
