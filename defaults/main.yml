@@ -1,8 +1,9 @@
-# SPDX-FileCopyrightText: 2023 - 2024 Nikita Chernyi
-# SPDX-FileCopyrightText: 2023 - 2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2023, 2024 Nikita Chernyi
+# SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2024 Julian-Samuel Gebühr
 # SPDX-FileCopyrightText: 2024 Sergio Durigan Junior
 # SPDX-FileCopyrightText: 2025 MASH project contributors
-# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -219,6 +220,12 @@ ghostfolio_container_cleanup_command: |
   echo "Failed to remove stale container {{ ghostfolio_identifier }} after {{ ghostfolio_container_cleanup_timeout_seconds }} attempts" >&2;
   exit 1
 
+########################################################################
+#                                                                      #
+# database                                                             #
+#                                                                      #
+########################################################################
+
 # Specify database configuration
 ghostfolio_database_hostname: ""
 ghostfolio_database_port: 5432
@@ -229,7 +236,29 @@ ghostfolio_database_name: "ghostfolio-db"
 # By default, we expect a local container (without SSL), so attempting SSL connections is not necessary.
 # Valid values: see https://www.postgresql.org/docs/11/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS
 ghostfolio_database_sslmode: disable
-ghostfolio_environment_variable_database_url: "postgresql://{{ ghostfolio_database_username }}:{{ ghostfolio_database_password }}@{{ ghostfolio_database_hostname }}:{{ ghostfolio_database_port }}/{{ ghostfolio_database_name }}?connect_timeout=300&sslmode={{ ghostfolio_database_sslmode }}"
+
+ghostfolio_environment_variable_database_url: |
+  postgres://{{ ghostfolio_database_username }}:{{ ghostfolio_database_password }}@
+  {%- if ghostfolio_database_socket_enabled -%}
+  localhost/{{ ghostfolio_database_name }}?host={{ ghostfolio_database_socket_path_container }}
+  {%- else -%}
+  {{ ghostfolio_database_hostname }}:{{ ghostfolio_database_port }}/{{ ghostfolio_database_name }}?sslmode={{ ghostfolio_database_sslmode }}
+  {% endif %}
+
+# Control if the connection to Postgres is made via a Unix socket
+ghostfolio_database_socket_enabled: true
+
+# Specify the path to the Postgres Unix socket path on the host (bind-mount source)
+ghostfolio_database_socket_path_host: ""
+
+# Specify the path to the Postgres Unix socket path inside the Ghostfolio server container
+ghostfolio_database_socket_path_container: /run-postgres
+
+########################################################################
+#                                                                      #
+# /database                                                            #
+#                                                                      #
+########################################################################
 
 # Specify configuration for Redis, KeyDB, or Valkey server
 ghostfolio_redis_hostname: ""
