@@ -26,18 +26,19 @@
   ansible.builtin.fail:
     msg: >-
       You need to define a required configuration setting (`{{ item }}`).
-  when: "lookup('vars', item, default='') | string | length == 0"
+  when: "item.when | bool and lookup('vars', item.name, default='') | string | length == 0"
   with_items:
-    - ghostfolio_uid
-    - ghostfolio_gid
-    - ghostfolio_hostname
-    - ghostfolio_path_prefix
-    - ghostfolio_container_network
-    - ghostfolio_database_hostname
-    - ghostfolio_database_password
-    - ghostfolio_redis_hostname
-    - ghostfolio_environment_variable_access_token_salt
-    - ghostfolio_environment_variable_jwt_secret_key
+    - { "name": "ghostfolio_uid", when: true }
+    - { "name": "ghostfolio_gid", when: true }
+    - { "name": "ghostfolio_hostname", when: true }
+    - { "name": "ghostfolio_path_prefix", when: true }
+    - { "name": "ghostfolio_container_network", when: true }
+    - { "name": "ghostfolio_database_socket_path_host", when: "{{ ghostfolio_database_socket_enabled }}" }
+    - { "name": "ghostfolio_database_hostname", when: "{{ not ghostfolio_database_socket_enabled }}" }
+    - { "name": "ghostfolio_database_password", when: true }
+    - { "name": "ghostfolio_redis_hostname", when: true }
+    - { "name": "ghostfolio_environment_variable_access_token_salt", when: true }
+    - { "name": "ghostfolio_environment_variable_jwt_secret_key", when: true }
 
 - name: Fail if Ghostfolio logging level is invalid
   ansible.builtin.fail:
