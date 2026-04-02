@@ -77,7 +77,9 @@ ghostfolio_environment_variable_access_token_salt: RANDOM_ACCESS_TOKEN_SALT_HERE
 ghostfolio_environment_variable_jwt_secret_key: RANDOM_SECRET_KEY_HERE
 ```
 
-### Set variables for Postgres database server
+### Configuring database
+
+#### Set variables for the database server
 
 To have the Ghostfolio instance connect to your Postgres server, add the following configuration to your `vars.yml` file.
 
@@ -89,7 +91,7 @@ ghostfolio_database_name: YOUR_POSTGRES_SERVER_DATABASE_NAME_HERE
 
 Make sure to replace values for variables with yours.
 
-### Configuring connection to Postgres server
+#### Configuring connection to the database server (optional)
 
 By default the role is configured to establish connection with the Postgres server via the Unix socket. You can mount the Unix socket by adding the following configuration to your `vars.yml` file:
 
