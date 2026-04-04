@@ -25,7 +25,7 @@
 - name: Fail if required Ghostfolio settings not defined
   ansible.builtin.fail:
     msg: >-
-      You need to define a required configuration setting (`{{ item }}`).
+      You need to define a required configuration setting (`{{ item.name }}`).
   when: "item.when | bool and lookup('vars', item.name, default='') | string | length == 0"
   with_items:
     - { "name": "ghostfolio_uid", when: true }
