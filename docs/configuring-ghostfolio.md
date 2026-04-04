@@ -28,7 +28,7 @@ See the project's [documentation](https://ghostfol.io/en/features) to learn what
 
 ## Prerequisites
 
-To run a Ghostfolio instance it is necessary to prepare a [Postgres](https://www.postgresql.org/) database server and [Redis](https://redis.io/) server for managing cache data.
+To run a Ghostfolio instance it is necessary to prepare a [Postgres](https://www.postgresql.org/) database server and [Redis](https://redis.io/) database for managing cache data.
 
 If you are looking for Ansible roles for them, you can check out [ansible-role-postgres](https://github.com/mother-of-all-self-hosting/ansible-role-postgres) and [ansible-role-redis](https://github.com/mother-of-all-self-hosting/ansible-role-redis), both of which are maintained by the [Mother-of-All-Self-Hosting (MASH)](https://github.com/mother-of-all-self-hosting) team. The roles for [KeyDB](https://keydb.dev/) ([ansible-role-keydb](https://github.com/mother-of-all-self-hosting/ansible-role-keydb)) and [Valkey](https://valkey.io/) ([ansible-role-valkey](https://github.com/mother-of-all-self-hosting/ansible-role-valkey)) are available as well.
 
@@ -112,11 +112,11 @@ ghostfolio_database_hostname: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
 ghostfolio_database_port: 5432
 ```
 
-### Set variables for connecting to a Redis cache server
+### Configure a Redis database
 
-As described above, it is also necessary to set up a [Redis](https://redis.io/) server for managing a metadata database of a Ghostfolio instance. You can use either KeyDB or Valkey alternatively.
+It is necessary to set up a [Redis](https://redis.io/) database for the Ghostfolio instance. KeyDB or Valkey can also be used instead.
 
-Having configured it, you need to add and adjust the following configuration to your `vars.yml` file, so that the Ghostfolio instance will connect to the server:
+To enable the Redis database for Ghostfolio, add the following configuration to your `vars.yml` file:
 
 ```yaml
 ghostfolio_redis_hostname: YOUR_REDIS_SERVER_HOSTNAME_HERE
