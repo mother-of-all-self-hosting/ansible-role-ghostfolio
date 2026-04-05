@@ -237,14 +237,6 @@ ghostfolio_database_name: "ghostfolio-db"
 # Valid values: see https://www.postgresql.org/docs/11/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS
 ghostfolio_database_sslmode: disable
 
-ghostfolio_environment_variable_database_url: |
-  postgres://{{ ghostfolio_database_username }}:{{ ghostfolio_database_password }}@
-  {%- if ghostfolio_database_socket_enabled -%}
-  localhost/{{ ghostfolio_database_name }}?host={{ ghostfolio_database_socket_path_container }}
-  {%- else -%}
-  {{ ghostfolio_database_hostname }}:{{ ghostfolio_database_port }}/{{ ghostfolio_database_name }}?sslmode={{ ghostfolio_database_sslmode }}
-  {%- endif -%}
-
 # Control if the connection to Postgres is made via a Unix socket
 ghostfolio_database_socket_enabled: true
 
@@ -253,6 +245,14 @@ ghostfolio_database_socket_path_host: ""
 
 # Specify the path to the Postgres Unix socket path inside the Ghostfolio server container
 ghostfolio_database_socket_path_container: /run-postgres
+
+ghostfolio_environment_variable_database_url: |-
+  postgres://{{ ghostfolio_database_username }}:{{ ghostfolio_database_password }}@
+  {%- if ghostfolio_database_socket_enabled -%}
+  localhost/{{ ghostfolio_database_name }}?host={{ ghostfolio_database_socket_path_container }}
+  {%- else -%}
+  {{ ghostfolio_database_hostname }}:{{ ghostfolio_database_port }}/{{ ghostfolio_database_name }}?sslmode={{ ghostfolio_database_sslmode }}
+  {%- endif -%}
 
 ########################################################################
 #                                                                      #
