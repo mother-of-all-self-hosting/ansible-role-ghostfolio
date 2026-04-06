@@ -243,7 +243,7 @@ ghostfolio_database_socket_enabled: true
 # Specify the path to the Postgres Unix socket path on the host (bind-mount source)
 ghostfolio_database_socket_path_host: ""
 
-# Specify the path to the Postgres Unix socket path inside the Ghostfolio server container
+# Specify the path to the Postgres Unix socket path inside the Ghostfolio container
 ghostfolio_database_socket_path_container: /run-postgres
 
 ghostfolio_environment_variable_database_url: |-
