@@ -260,7 +260,7 @@ ghostfolio_environment_variable_database_url: |-
 #                                                                      #
 ########################################################################
 
-# Specify configuration for Redis, KeyDB, or Valkey server
+# Specify configuration for Redis
 ghostfolio_redis_hostname: ""
 ghostfolio_redis_port: 6379
 ghostfolio_redis_password: ""
