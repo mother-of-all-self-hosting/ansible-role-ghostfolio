@@ -33,6 +33,7 @@
     - { "name": "ghostfolio_hostname", when: true }
     - { "name": "ghostfolio_path_prefix", when: true }
     - { "name": "ghostfolio_container_network", when: true }
+    - { "name": "ghostfolio_container_labels_traefik_middleware_basic_auth_users", when: "{{ ghostfolio_container_labels_traefik_middleware_basic_auth_enabled }}" }
     - { "name": "ghostfolio_database_socket_path_host", when: "{{ ghostfolio_database_socket_enabled }}" }
     - { "name": "ghostfolio_database_hostname", when: "{{ not ghostfolio_database_socket_enabled }}" }
     - { "name": "ghostfolio_database_password", when: true }
