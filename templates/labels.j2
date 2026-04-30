@@ -15,8 +15,8 @@ traefik.docker.network={{ ghostfolio_container_labels_traefik_docker_network }}
 {% set middlewares = [] %}
 
 {% if ghostfolio_container_labels_traefik_middleware_basic_auth_enabled %}
-{% set middlewares = middlewares + [ghostfolios_identifier + '-basic-auth'] %}
-traefik.http.middlewares.{{ ghostfolios_identifier }}-basic-auth.basicauth.users={{ ghostfolio_container_labels_traefik_middleware_basic_auth_users }}
+{% set middlewares = middlewares + [ghostfolio_identifier + '-basic-auth'] %}
+traefik.http.middlewares.{{ ghostfolio_identifier }}-basic-auth.basicauth.users={{ ghostfolio_container_labels_traefik_middleware_basic_auth_users }}
 {% endif %}
 
 {% if ghostfolio_container_labels_traefik_path_prefix != '/' %}
