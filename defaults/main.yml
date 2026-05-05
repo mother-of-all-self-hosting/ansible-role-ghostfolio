@@ -39,7 +39,6 @@ ghostfolio_container_image_tag: "{{ ghostfolio_version }}"
 ghostfolio_container_image_registry_prefix: "{{ ghostfolio_container_image_registry_prefix_upstream }}"
 ghostfolio_container_image_registry_prefix_upstream: "{{ ghostfolio_container_image_registry_prefix_upstream_default }}"
 ghostfolio_container_image_registry_prefix_upstream_default: docker.io/
-ghostfolio_container_image_force_pull: "{{ ghostfolio_container_image.endswith(':latest') }}"
 
 ghostfolio_container_image_self_build: false
 ghostfolio_container_image_self_build_name: "ghostfolio/ghostfolio:{{ ghostfolio_container_image_self_build_repo_version }}"

@@ -21,6 +21,7 @@
     - { "old": "ghostfolio_environment_variable_redis_password", "new": "ghostfolio_redis_password" }
     - { "old": "ghostfolio_environment_variable_redis_db", "new": "ghostfolio_redis_db" }
     - { "old": "ghostfolio_http_header_content_permission_policy", "new": "ghostfolio_http_header_permissions_policy" }
+    - { "old": "ghostfolio_container_image_force_pull", "new": "<removed> (the new community.docker.docker_image_pull module handles this natively)" }
 
 - name: Fail if required Ghostfolio settings not defined
   ansible.builtin.fail:
