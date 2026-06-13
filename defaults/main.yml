@@ -16,7 +16,7 @@ ghostfolio_identifier: ghostfolio
 ghostfolio_base_path: "/{{ ghostfolio_identifier }}"
 
 # renovate: datasource=docker depName=ghostfolio/ghostfolio versioning=semver
-ghostfolio_version: 3.9.0
+ghostfolio_version: 3.10.0
 
 ghostfolio_uid: ""
 ghostfolio_gid: ""
