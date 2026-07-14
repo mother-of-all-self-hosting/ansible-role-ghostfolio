@@ -20,6 +20,11 @@ roles:
     scm: git
     version: v18.4-2
 
+  - name: ansible-role-valkey
+    src: https://github.com/mother-of-all-self-hosting/ansible-role-valkey
+    scm: git
+    version: v9.1.0-0
+
 collections:
   - name: community.docker
     version: 5.2.1

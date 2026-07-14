@@ -17,6 +17,7 @@
         - com.devture.ansible.role.playbook_help
         - com.devture.ansible.role.systemd_docker_base
         - ansible-role-postgres
+        - ansible-role-valkey
         - "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
       loop_control:
         loop_var: role_name
@@ -33,6 +34,11 @@
     - name: Ensure Postgres systemd service is started
       ansible.builtin.systemd_service:
         name: postgres.service
+        state: started
+
+    - name: Ensure Valkey systemd service is started
+      ansible.builtin.systemd_service:
+        name: valkey.service
         state: started
 
     - name: Ensure Ghostfolio systemd service is started

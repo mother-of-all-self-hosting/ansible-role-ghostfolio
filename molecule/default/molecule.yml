@@ -48,6 +48,13 @@ provisioner:
             (['postgres.service'])
           }}
 
+        # Variables required for Ghostfolio to connect to the Valkey data-store
+        ghostfolio_redis_hostname: "{{ valkey_identifier }}"
+        ghostfolio_container_additional_networks_custom:
+          - "{{ valkey_container_network }}"
+        ghostfolio_systemd_required_services_list_custom:
+          - "{{ valkey_identifier }}.service"
+
         # Variables for Postgres
         postgres_uid: 1000
         postgres_gid: 1000
@@ -61,6 +68,11 @@ provisioner:
               'password': ghostfolio_database_password,
             }]
           }}
+
+        # Variables for Valkey
+        valkey_uid: 1000
+        valkey_gid: 1000
+        valkey_arch: amd64
   env:
     # Workaround for https://github.com/ansible/molecule/issues/4391
     ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/..:/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.ansible/roles
