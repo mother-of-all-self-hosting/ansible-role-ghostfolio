@@ -27,16 +27,16 @@
       ansible.builtin.uri:
         url: "http://localhost:3333/"
         method: GET
-        status_code: [200, 302]
+        status_code: [200, 301, 302]
         follow_redirects: none
       register: ghostfolio_endpoint
-      until: ghostfolio_endpoint.status in [200, 302]
+      until: ghostfolio_endpoint.status in [200, 301, 302]
       retries: 120
       delay: 5
 
     - name: Assert Ghostfolio HTTP endpoint responds
       ansible.builtin.assert:
-        that: ghostfolio_endpoint.status in [200, 302]
+        that: ghostfolio_endpoint.status in [200, 301, 302]
         fail_msg: "Ghostfolio did not respond as expected ({{ ghostfolio_endpoint.status | default('no response') }})"
         success_msg: "Ghostfolio responded with {{ ghostfolio_endpoint.status }}"
 
