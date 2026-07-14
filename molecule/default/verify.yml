@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2026 Suguru Hirahara
+# SPDX-FileCopyrightText: 2026 spatterlight
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Verify Ghostfolio systemd service
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Wait for Ghostfolio service to become active (up to 180s)
+      ansible.builtin.systemd:
+        name: ghostfolio.service
+      register: ghostfolio_service
+      until: ghostfolio_service.status.ActiveState == 'active'
+      retries: 36
+      delay: 5
+
+    - name: Assert Ghostfolio service is active
+      ansible.builtin.assert:
+        that: ghostfolio_service.status.ActiveState == 'active'
+        fail_msg: "ghostfolio.service not active ({{ ghostfolio_service.status.ActiveState }})"
+        success_msg: "ghostfolio.service is active"
+
+    - name: Wait for Ghostfolio HTTP endpoint to respond (up to 10m)
+      ansible.builtin.uri:
+        url: "http://localhost:3333/"
+        method: GET
+        status_code: [200, 302]
+        follow_redirects: none
+      register: ghostfolio_endpoint
+      until: ghostfolio_endpoint.status in [200, 302]
+      retries: 120
+      delay: 5
+
+    - name: Assert Ghostfolio HTTP endpoint responds
+      ansible.builtin.assert:
+        that: ghostfolio_endpoint.status in [200, 302]
+        fail_msg: "Ghostfolio did not respond as expected ({{ ghostfolio_endpoint.status | default('no response') }})"
+        success_msg: "Ghostfolio responded with {{ ghostfolio_endpoint.status }}"
+
+    - name: Show Ghostfolio systemd service status summary
+      ansible.builtin.debug:
+        msg:
+          - "Ghostfolio systemd: {{ ghostfolio_service.status.ActiveState }}"
+          - "Ghostfolio HTTP: {{ ghostfolio_endpoint.status }}"
