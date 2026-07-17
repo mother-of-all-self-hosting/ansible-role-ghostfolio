@@ -27,6 +27,9 @@ provisioner:
   inventory:
     group_vars:
       all:
+        # Helper variables
+        ghostfolio_debug_service_enabled: false
+
         # Variables for Ghostfolio
         ghostfolio_uid: 1000
         ghostfolio_gid: 1000

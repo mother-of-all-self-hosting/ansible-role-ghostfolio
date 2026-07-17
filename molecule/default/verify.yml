@@ -23,6 +23,12 @@
         fail_msg: "ghostfolio.service not active ({{ ghostfolio_service.status.ActiveState }})"
         success_msg: "ghostfolio.service is active"
 
+    - name: Retrieve Ghostfolio service log for debugging
+      when: ghostfolio_debug_service_enabled | bool
+      ansible.builtin.command:
+        cmd: journalctl -xeu ghostfolio.service
+      changed_when: false
+
     - name: Wait for Ghostfolio HTTP endpoint to respond (up to 10m)
       ansible.builtin.uri:
         url: "http://localhost:3333/"
