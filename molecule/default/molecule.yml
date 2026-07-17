@@ -33,7 +33,8 @@ provisioner:
         # Variables for Ghostfolio
         ghostfolio_uid: 1000
         ghostfolio_gid: 1000
-        ghostfolio_hostname: ghostfolio
+        ghostfolio_scheme: http
+        ghostfolio_hostname: localhost
         ghostfolio_container_labels_traefik_enabled: false
         ghostfolio_container_http_host_bind_port: 3333
         ghostfolio_environment_variable_access_token_salt: salt
