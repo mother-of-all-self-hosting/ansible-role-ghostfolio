@@ -3,7 +3,7 @@ galaxy_info:
   author: Suguru Hirahara
   company: progressiv
   role_name: ghostfolio
-  namespace: progressiv
+  namespace: mash
   description: Ghostfolio
   platforms:
     - name: Debian
