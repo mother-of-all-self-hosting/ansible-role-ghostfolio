@@ -38,8 +38,18 @@ provisioner:
         ghostfolio_hostname: localhost
         ghostfolio_container_labels_traefik_enabled: false
         ghostfolio_container_http_host_bind_port: 3333
+        # Deliberately not the 3333 the image itself defaults to. Ghostfolio
+        # listens on whatever `PORT` says, and `PORT` only reaches it through
+        # the env file this role renders, so the port mapping above only lines
+        # up with a listener if that file arrived. See `verify.yml`.
+        ghostfolio_container_http_port: 4333
         ghostfolio_environment_variable_access_token_salt: salt
         ghostfolio_environment_variable_jwt_secret_key: secret
+        # A value Ghostfolio itself has no opinion about, carried end to end so
+        # that `verify.yml` can find it in the environment of the running
+        # process and know the additional-variables plumbing works.
+        ghostfolio_environment_variables_additional_variables: |
+          MOLECULE_MARKER=ghostfolio-molecule-default
 
         # Variables required for Ghostfolio to connect to the Postgres database (via Unix socket)
         ghostfolio_database_username: my_database_username
