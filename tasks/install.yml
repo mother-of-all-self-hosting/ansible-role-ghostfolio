@@ -67,6 +67,12 @@
         path: "{{ ghostfolio_container_image_self_build_src_files_path }}"
         pull: true
         rebuild: "{{ 'always' if ghostfolio_git_pull_results.changed | bool else 'never' }}"
+        args:
+          # Ghostfolio's Dockerfile opens with `FROM --platform=$BUILDPLATFORM`,
+          # so the build stage runs on whatever this names. Without passing it,
+          # `ghostfolio_container_image_self_build_environment_buildplatform`
+          # was a setting that did nothing.
+          BUILDPLATFORM: "{{ ghostfolio_container_image_self_build_environment_buildplatform }}"
       register: ghostfolio_container_image_build_result
 
 - name: Ensure Ghostfolio container network is created via community.docker.docker_network
