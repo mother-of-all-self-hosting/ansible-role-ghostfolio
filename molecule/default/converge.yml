@@ -41,19 +41,19 @@
         name: valkey.service
         state: started
 
-    - name: Ensure Ghostfolio systemd service is started
-      ansible.builtin.systemd_service:
-        name: ghostfolio.service
-        state: started
-
     # `state: started` leaves an already-running service alone, so on a second
     # converge against the same instance it would keep running the previous
     # unit file and `verify.yml` would be probing something the role no longer
     # generates. The role works out whether anything it manages changed;
     # acting on that here is what a playbook's systemd service manager role
     # does, and it stays idempotent because an unchanged run computes `false`.
-    - name: Ensure Ghostfolio systemd service is restarted if necessary
-      when: ghostfolio_restart_necessary | bool
+    #
+    # One task rather than a start followed by a conditional restart: on a
+    # first converge everything the role manages has just changed, so a
+    # separate restart would tear the container down and make Ghostfolio run
+    # its whole migration set a second time before it ever serves anything.
+    # `restarted` starts a service that is not running, so this covers both.
+    - name: Ensure Ghostfolio systemd service is started
       ansible.builtin.systemd_service:
         name: ghostfolio.service
-        state: restarted
+        state: "{{ 'restarted' if ghostfolio_restart_necessary | bool else 'started' }}"

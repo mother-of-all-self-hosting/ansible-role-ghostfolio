@@ -76,52 +76,85 @@
         cmd: journalctl -xeu ghostfolio.service
       changed_when: false
 
-    # `/api/v1/health` is the first thing here that cannot lie, and only its
-    # body can be trusted. Ghostfolio serves a single-page application under
-    # every locale prefix, and any path below one of those - a typo as much as
-    # a real route - is answered with the same 200 and the same HTML shell, so
-    # a status code on `/` or `/en` proves nothing at all. This endpoint
-    # answers `{"status":"OK"}` as JSON.
-    #
-    # Reaching it means more than that the process is up: it is served only
-    # once the entrypoint has finished `prisma migrate deploy` and
-    # `prisma db seed` against the configured database (a Ghostfolio that
-    # cannot reach Postgres exits before it ever listens), and the endpoint
-    # does not answer at all while Redis is unreachable - a container pointed
-    # at a bad `REDIS_HOST` leaves this request open until it times out while
-    # still serving the shell on `/en` quite happily.
-    #
-    # 10 minutes, because on a first boot this waits out the whole migration
-    # run.
-    - name: Wait for the Ghostfolio health endpoint to answer (up to 10m)
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/api/v1/health"
-        method: GET
-        follow_redirects: none
-        status_code: [200, 404, 500, 502, 503]
-        timeout: 20
-        return_content: true
-      register: ghostfolio_health
-      until: ghostfolio_health.status == 200 and (ghostfolio_health.json.status | default('')) == 'OK'
-      retries: 120
-      delay: 5
+    # Both waits, so that whichever of them runs out says so with the
+    # application's own output beside it rather than with a bare timeout.
+    - name: Wait for Ghostfolio to become usable
+      block:
+        # Waiting for Ghostfolio to boot is a separate question from whether it
+        # works, and separating them keeps a failure legible. Nothing is served
+        # until the entrypoint has finished `prisma migrate deploy` and
+        # `prisma db seed` against the configured database - over a hundred
+        # migrations on a first boot, and a Ghostfolio that cannot reach
+        # Postgres exits before it ever listens - so this wait is the long one.
+        #
+        # Being answered on this URL at all also proves the env file this role
+        # renders reached the process: the image listens on 3333 unless `PORT`
+        # says otherwise, only that file sets `PORT`, and the scenario asks for
+        # a different port and maps the host port onto it. A Ghostfolio running
+        # on the image's own default would have nothing behind the mapping.
+        #
+        # This proves nothing else. `/en/<anything>` is the single-page
+        # application shell, and the assertions below rely on that being true.
+        - name: Wait for Ghostfolio to finish migrating and start serving (up to 15m)
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/en"
+            method: GET
+            follow_redirects: none
+            status_code: [200, 404, 500, 502, 503]
+            timeout: 10
+            return_content: false
+          register: ghostfolio_serving
+          until: ghostfolio_serving.status == 200
+          retries: 180
+          delay: 5
+
+        - name: Show which container port Ghostfolio was reached through
+          ansible.builtin.debug:
+            msg: >-
+              Reached Ghostfolio on container port {{ ghostfolio_container_http_port }},
+              which only a process that read the role's env file listens on
+
+        # `/api/v1/health` is the first thing here that cannot lie, and only
+        # its body can be trusted - a status code on the shell above proves
+        # nothing. This endpoint answers `{"status":"OK"}` as JSON, and it does
+        # not answer at all while Redis is unreachable: a container pointed at
+        # a bad `REDIS_HOST` leaves this request open until it times out while
+        # still serving the shell on `/en` quite happily.
+        #
+        # Short window, since Ghostfolio is already serving by the time this
+        # runs.
+        - name: Wait for the Ghostfolio health endpoint to answer (up to 3m)
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/api/v1/health"
+            method: GET
+            follow_redirects: none
+            status_code: [200, 404, 500, 502, 503]
+            timeout: 10
+            return_content: true
+          register: ghostfolio_health
+          until: ghostfolio_health.status == 200 and (ghostfolio_health.json.status | default('')) == 'OK'
+          retries: 36
+          delay: 5
+
+      rescue:
+        - name: Retrieve the Ghostfolio service log after a failed wait
+          ansible.builtin.command:
+            cmd: journalctl -xeu ghostfolio.service --no-pager --lines=200
+          register: ghostfolio_failure_log
+          changed_when: false
+          failed_when: false
+
+        - name: Fail with the Ghostfolio service log
+          ansible.builtin.fail:
+            msg: >-
+              Ghostfolio never became usable.
+              {{ ghostfolio_failure_log.stdout | default('no journal output') }}
 
     - name: Assert the Ghostfolio health endpoint reports OK
       ansible.builtin.assert:
         that: ghostfolio_health.json.status == 'OK'
         fail_msg: "The Ghostfolio health endpoint answered '{{ ghostfolio_health.content | default('nothing') | trim }}'"
         success_msg: "The Ghostfolio health endpoint reports OK"
-
-    # Answering on this port at all is what proves the env file reached the
-    # process. The image listens on 3333 unless `PORT` says otherwise, and the
-    # only thing that sets `PORT` is the env file this role renders; the
-    # scenario asks for 4333 and maps the host port onto that, so a Ghostfolio
-    # running on the image's own default would have nothing behind the mapping.
-    - name: Show which container port the health endpoint was reached through
-      ansible.builtin.debug:
-        msg: >-
-          Reached Ghostfolio on container port {{ ghostfolio_container_http_port }},
-          which only a process that read the role's env file listens on
 
     # Proof that the health check above is worth anything: a path Ghostfolio
     # does not route comes back 200 with the single-page application shell,
@@ -407,6 +440,7 @@
       ansible.builtin.debug:
         msg:
           - "Ghostfolio systemd: {{ ghostfolio_service.status.ActiveState }}"
+          - "Ghostfolio serving on container port {{ ghostfolio_container_http_port }}: {{ ghostfolio_serving.status }}"
           - "Ghostfolio health: {{ ghostfolio_health.status }} {{ ghostfolio_health.json.status }}"
           - "Ghostfolio version over HTTP: {{ ghostfolio_admin.json.version }}"
           - "Ghostfolio version in the running bundle: {{ ghostfolio_package_version.stdout | trim }}"
