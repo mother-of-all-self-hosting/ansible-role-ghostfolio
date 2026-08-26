@@ -11,8 +11,8 @@
     "On the annotation in defaults/main.yml: `versioning=semver` is load-bearing. ghostfolio/ghostfolio publishes floating `2`, `3` and `latest` tags, none of which are valid semver versions, so under `semver` they drop out as candidates; the `-alpha` and `-beta.N` tags are valid semver prereleases and are skipped as unstable. Only the plain X.Y.Z tags remain, which is the intent. No `extractVersion` is needed, as the tags carry no flavour suffix."
   ],
   "extends": [
-    "github>mother-of-all-self-hosting/renovate-config#v1.0.0",
-    "github>mother-of-all-self-hosting/renovate-config//patch-automerge#v1.0.0"
+    "github>mother-of-all-self-hosting/renovate-config#v1.1.0",
+    "github>mother-of-all-self-hosting/renovate-config//patch-automerge#v1.1.0"
   ],
   "regex": {
     "schedule": ["* * * * 1"]
