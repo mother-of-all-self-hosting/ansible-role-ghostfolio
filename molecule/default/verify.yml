@@ -55,12 +55,6 @@
       retries: 36
       delay: 5
 
-    # This is a gate, not evidence. The unit is `Type=simple` with
-    # `Restart=always`, so systemd calls it active the moment `docker start` is
-    # running - which here is a shell script that has yet to run over a hundred
-    # Prisma migrations before `node main` is even executed - and a Ghostfolio
-    # that dies on every start still cycles back through `active` between
-    # restarts. Everything that proves anything comes after this.
     - name: Assert Ghostfolio service is active
       ansible.builtin.assert:
         that: ghostfolio_service.status.ActiveState == 'active'
