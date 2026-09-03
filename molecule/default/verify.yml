@@ -249,13 +249,11 @@
         timeout: 60
       register: ghostfolio_admin
 
-    - name: Assert Ghostfolio reports the version this role installs
+    - name: Assert the running Ghostfolio is the version this role installs
       ansible.builtin.assert:
         that: ghostfolio_admin.json.version == ghostfolio_defaults.ghostfolio_version
-        fail_msg: >-
-          Ghostfolio reports {{ ghostfolio_admin.json.version | default('no version') }},
-          expected {{ ghostfolio_defaults.ghostfolio_version }}
-        success_msg: "Ghostfolio reports version {{ ghostfolio_admin.json.version }}"
+        fail_msg: "Ghostfolio reports {{ ghostfolio_admin.json.version | default('none') }}, expected {{ ghostfolio_defaults.ghostfolio_version }}"
+        success_msg: "Ghostfolio reports {{ ghostfolio_admin.json.version }}"
 
     # A second, independent leaf for the same claim: the package manifest of
     # the bundle `node` is running, rather than a number the API could be
@@ -277,9 +275,7 @@
     - name: Assert the running bundle is the version this role installs
       ansible.builtin.assert:
         that: ghostfolio_package_version.stdout | trim == ghostfolio_defaults.ghostfolio_version
-        fail_msg: >-
-          The running bundle is {{ ghostfolio_package_version.stdout | trim }},
-          expected {{ ghostfolio_defaults.ghostfolio_version }}
+        fail_msg: "The running bundle is {{ ghostfolio_package_version.stdout | trim }}, expected {{ ghostfolio_defaults.ghostfolio_version }}"
         success_msg: "The running bundle is {{ ghostfolio_package_version.stdout | trim }}"
 
     # Everything the role puts in the env file has to arrive in the process,
