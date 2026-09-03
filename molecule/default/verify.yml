@@ -147,7 +147,7 @@
     - name: Assert the Ghostfolio health endpoint reports OK
       ansible.builtin.assert:
         that: ghostfolio_health.json.status == 'OK'
-        fail_msg: "The Ghostfolio health endpoint answered '{{ ghostfolio_health.content | default('nothing') | trim }}'"
+        fail_msg: "The Ghostfolio health endpoint answered '{{ ghostfolio_health.content | default('none') | trim }}'"
         success_msg: "The Ghostfolio health endpoint reports OK"
 
     # Proof that the health check above is worth anything: a path Ghostfolio
