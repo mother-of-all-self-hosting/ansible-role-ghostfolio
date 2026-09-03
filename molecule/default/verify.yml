@@ -426,7 +426,7 @@
         fail_msg: "Valkey has no clients beyond this query itself - Ghostfolio is not connected to it"
         success_msg: "Valkey is serving {{ ghostfolio_valkey_clients.stdout_lines | length }} connections"
 
-    - name: Show Ghostfolio verification summary
+    - name: Show the Ghostfolio verification summary
       ansible.builtin.debug:
         msg:
           - "Ghostfolio systemd: {{ ghostfolio_service.status.ActiveState }}"
