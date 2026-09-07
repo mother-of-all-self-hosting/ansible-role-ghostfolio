@@ -45,24 +45,27 @@
         file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
         name: ghostfolio_defaults
 
-    - name: Wait for Ghostfolio service to become active (up to 180s)
-      ansible.builtin.systemd:
+    - name: Wait for the Ghostfolio systemd service to become active (up to 180s)
+      ansible.builtin.systemd_service:
         name: ghostfolio.service
       register: ghostfolio_service
       until: ghostfolio_service.status.ActiveState == 'active'
       retries: 36
       delay: 5
+      # So that giving up is reported by the assertion below rather than as a
+      # wall of systemd unit properties.
+      failed_when: false
 
-    - name: Assert Ghostfolio service is active
+    # `Restart=always` in the systemd unit means that even a container which crashes
+    # and gets restarted reads as active here, so this is a precondition rather than
+    # a result.
+    - name: Assert the Ghostfolio systemd service is active
       ansible.builtin.assert:
         that: ghostfolio_service.status.ActiveState == 'active'
-        fail_msg: "ghostfolio.service not active ({{ ghostfolio_service.status.ActiveState }})"
+        fail_msg: "ghostfolio.service is not active ({{ ghostfolio_service.status.ActiveState }})"
         success_msg: "ghostfolio.service is active"
 
-    # The container is created with `--log-driver=none`, so `docker logs` is
-    # empty by design; the unit runs `docker start --attach`, which puts the
-    # application's output into the journal instead.
-    - name: Retrieve Ghostfolio service log for debugging
+    - name: Retrieve the Ghostfolio systemd service log for debugging
       when: ghostfolio_debug_service_enabled | bool
       ansible.builtin.command:
         cmd: journalctl -xeu ghostfolio.service
@@ -129,14 +132,14 @@
           delay: 5
 
       rescue:
-        - name: Retrieve the Ghostfolio service log after a failed wait
+        - name: Retrieve the Ghostfolio systemd service log after a failed wait
           ansible.builtin.command:
             cmd: journalctl -xeu ghostfolio.service --no-pager --lines=200
           register: ghostfolio_failure_log
           changed_when: false
           failed_when: false
 
-        - name: Fail with the Ghostfolio service log
+        - name: Fail with the Ghostfolio systemd service log
           ansible.builtin.fail:
             msg: >-
               Ghostfolio never became usable.
