@@ -238,7 +238,7 @@
     # The running build reporting its own version, from the endpoint that backs
     # the "Admin Control" page. This is the number Renovate bumps in
     # defaults/main.yml, checked against what is actually executing.
-    - name: Ask Ghostfolio which version it is running
+    - name: Query the version of the running Ghostfolio
       ansible.builtin.uri:
         url: "{{ ghostfolio_verify_base_url }}/api/v1/admin"
         method: GET
