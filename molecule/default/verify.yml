@@ -68,7 +68,7 @@
     - name: Retrieve the Ghostfolio systemd service log for debugging
       when: ghostfolio_debug_service_enabled | bool
       ansible.builtin.command:
-        cmd: journalctl -xeu ghostfolio.service
+        cmd: journalctl --no-pager --output=cat --unit=ghostfolio.service
       changed_when: false
 
     # Both waits, so that whichever of them runs out says so with the
@@ -134,7 +134,7 @@
       rescue:
         - name: Retrieve the Ghostfolio systemd service log after a failed wait
           ansible.builtin.command:
-            cmd: journalctl -xeu ghostfolio.service --no-pager --lines=200
+            cmd: journalctl --no-pager --output=cat --unit=ghostfolio.service
           register: ghostfolio_failure_log
           changed_when: false
           failed_when: false
