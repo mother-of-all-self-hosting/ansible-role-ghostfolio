@@ -282,11 +282,7 @@
     # for.
     - name: Read the environment of the running Ghostfolio process
       ansible.builtin.command:
-        argv:
-          - docker
-          - exec
-          - "{{ ghostfolio_defaults.ghostfolio_identifier }}"
-          - env
+        cmd: docker exec {{ ghostfolio_defaults.ghostfolio_identifier }} env
       register: ghostfolio_container_env
       changed_when: false
 
