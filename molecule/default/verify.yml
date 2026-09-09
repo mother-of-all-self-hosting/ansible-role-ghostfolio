@@ -39,402 +39,402 @@
   tasks:
     - name: Verify that Ghostfolio works
       block:
-    # The role is not included in this playbook, so its defaults are not in
-    # scope. Reading defaults/main.yml directly ties the version assertion
-    # below.
-    - name: Load the role defaults
-      ansible.builtin.include_vars:
-        file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
-        name: ghostfolio_defaults
+        # The role is not included in this playbook, so its defaults are not in
+        # scope. Reading defaults/main.yml directly ties the version assertion
+        # below.
+        - name: Load the role defaults
+          ansible.builtin.include_vars:
+            file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
+            name: ghostfolio_defaults
 
-    - name: Wait for the Ghostfolio systemd service to become active (up to 180s)
-      ansible.builtin.systemd_service:
-        name: ghostfolio.service
-      register: ghostfolio_service
-      until: ghostfolio_service.status.ActiveState == 'active'
-      retries: 36
-      delay: 5
-      # So that giving up is reported by the assertion below rather than as a
-      # wall of systemd unit properties.
-      failed_when: false
-
-    # `Restart=always` in the systemd unit means that even a container which crashes
-    # and gets restarted reads as active here, so this is a precondition rather than
-    # a result.
-    - name: Assert the Ghostfolio systemd service is active
-      ansible.builtin.assert:
-        that: ghostfolio_service.status.ActiveState == 'active'
-        fail_msg: "ghostfolio.service is not active ({{ ghostfolio_service.status.ActiveState }})"
-        success_msg: "ghostfolio.service is active"
-
-    - name: Retrieve the Ghostfolio systemd service log for debugging
-      when: ghostfolio_debug_service_enabled | bool
-      ansible.builtin.command:
-        cmd: journalctl --no-pager --output=cat --unit=ghostfolio.service
-      changed_when: false
-
-    # Both waits, so that whichever of them runs out says so with the
-    # application's own output beside it rather than with a bare timeout.
-    - name: Wait for Ghostfolio to become usable
-      block:
-        # Waiting for Ghostfolio to boot is a separate question from whether it
-        # works, and separating them keeps a failure legible. Nothing is served
-        # until the entrypoint has finished `prisma migrate deploy` and
-        # `prisma db seed` against the configured database - over a hundred
-        # migrations on a first boot, and a Ghostfolio that cannot reach
-        # Postgres exits before it ever listens - so this wait is the long one.
-        #
-        # Being answered on this URL at all also proves the env file this role
-        # renders reached the process: the image listens on 3333 unless `PORT`
-        # says otherwise, only that file sets `PORT`, and the scenario asks for
-        # a different port and maps the host port onto it. A Ghostfolio running
-        # on the image's own default would have nothing behind the mapping.
-        #
-        # This proves nothing else. `/en/<anything>` is the single-page
-        # application shell, and the assertions below rely on that being true.
-        - name: Wait for Ghostfolio to finish migrating and start serving (up to 15m)
-          ansible.builtin.uri:
-            url: "{{ ghostfolio_verify_base_url }}/en"
-            method: GET
-            follow_redirects: none
-            status_code: [200, 404, 500, 502, 503]
-            timeout: 10
-            return_content: false
-          register: ghostfolio_serving
-          until: ghostfolio_serving.status == 200
-          retries: 180
-          delay: 5
-
-        - name: Show which container port Ghostfolio was reached through
-          ansible.builtin.debug:
-            msg: >-
-              Reached Ghostfolio on container port {{ ghostfolio_container_http_port }},
-              which only a process that read the role's env file listens on
-
-        # `/api/v1/health` is the first thing here that cannot lie, and only
-        # its body can be trusted - a status code on the shell above proves
-        # nothing. This endpoint answers `{"status":"OK"}` as JSON, and it does
-        # not answer at all while Redis is unreachable: a container pointed at
-        # a bad `REDIS_HOST` leaves this request open until it times out while
-        # still serving the shell on `/en` quite happily.
-        #
-        # Short window, since Ghostfolio is already serving by the time this
-        # runs.
-        - name: Wait for the Ghostfolio health endpoint to answer (up to 3m)
-          ansible.builtin.uri:
-            url: "{{ ghostfolio_verify_base_url }}/api/v1/health"
-            method: GET
-            follow_redirects: none
-            status_code: [200, 404, 500, 502, 503]
-            timeout: 10
-            return_content: true
-          register: ghostfolio_health
-          until: ghostfolio_health.status == 200 and (ghostfolio_health.json.status | default('')) == 'OK'
+        - name: Wait for the Ghostfolio systemd service to become active (up to 180s)
+          ansible.builtin.systemd_service:
+            name: ghostfolio.service
+          register: ghostfolio_service
+          until: ghostfolio_service.status.ActiveState == 'active'
           retries: 36
           delay: 5
-
-      rescue:
-        - name: Retrieve the Ghostfolio systemd service log after a failed wait
-          ansible.builtin.command:
-            cmd: journalctl --no-pager --output=cat --unit=ghostfolio.service
-          register: ghostfolio_failure_log
-          changed_when: false
+          # So that giving up is reported by the assertion below rather than as a
+          # wall of systemd unit properties.
           failed_when: false
 
-        - name: Fail with the Ghostfolio systemd service log
-          ansible.builtin.fail:
-            msg: >-
-              Ghostfolio never became usable.
-              {{ ghostfolio_failure_log.stdout | default('no journal output') }}
+        # `Restart=always` in the systemd unit means that even a container which crashes
+        # and gets restarted reads as active here, so this is a precondition rather than
+        # a result.
+        - name: Assert the Ghostfolio systemd service is active
+          ansible.builtin.assert:
+            that: ghostfolio_service.status.ActiveState == 'active'
+            fail_msg: "ghostfolio.service is not active ({{ ghostfolio_service.status.ActiveState }})"
+            success_msg: "ghostfolio.service is active"
 
-    - name: Assert the Ghostfolio health endpoint reports OK
-      ansible.builtin.assert:
-        that: ghostfolio_health.json.status == 'OK'
-        fail_msg: "The Ghostfolio health endpoint answered '{{ ghostfolio_health.content | default('none') | trim }}'"
-        success_msg: "The Ghostfolio health endpoint reports OK"
+        - name: Retrieve the Ghostfolio systemd service log for debugging
+          when: ghostfolio_debug_service_enabled | bool
+          ansible.builtin.command:
+            cmd: journalctl --no-pager --output=cat --unit=ghostfolio.service
+          changed_when: false
 
-    # Proof that the health check above is worth anything: a path Ghostfolio
-    # does not route comes back 200 with the single-page application shell,
-    # which is exactly what `/api/v1/health` would look like if it were not a
-    # real route.
-    - name: Request a path Ghostfolio does not route
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/en/molecule-no-such-path"
-        method: GET
-        follow_redirects: none
-        status_code: [200]
-        return_content: true
-      register: ghostfolio_unrouted
+        # Both waits, so that whichever of them runs out says so with the
+        # application's own output beside it rather than with a bare timeout.
+        - name: Wait for Ghostfolio to become usable
+          block:
+            # Waiting for Ghostfolio to boot is a separate question from whether it
+            # works, and separating them keeps a failure legible. Nothing is served
+            # until the entrypoint has finished `prisma migrate deploy` and
+            # `prisma db seed` against the configured database - over a hundred
+            # migrations on a first boot, and a Ghostfolio that cannot reach
+            # Postgres exits before it ever listens - so this wait is the long one.
+            #
+            # Being answered on this URL at all also proves the env file this role
+            # renders reached the process: the image listens on 3333 unless `PORT`
+            # says otherwise, only that file sets `PORT`, and the scenario asks for
+            # a different port and maps the host port onto it. A Ghostfolio running
+            # on the image's own default would have nothing behind the mapping.
+            #
+            # This proves nothing else. `/en/<anything>` is the single-page
+            # application shell, and the assertions below rely on that being true.
+            - name: Wait for Ghostfolio to finish migrating and start serving (up to 15m)
+              ansible.builtin.uri:
+                url: "{{ ghostfolio_verify_base_url }}/en"
+                method: GET
+                follow_redirects: none
+                status_code: [200, 404, 500, 502, 503]
+                timeout: 10
+                return_content: false
+              register: ghostfolio_serving
+              until: ghostfolio_serving.status == 200
+              retries: 180
+              delay: 5
 
-    - name: Assert an unrouted path is answered with the application shell rather than a health report
-      ansible.builtin.assert:
-        that:
-          - "'Ghostfolio' in ghostfolio_unrouted.content"
-          - "'\"status\"' not in ghostfolio_unrouted.content"
-        fail_msg: "A path Ghostfolio does not route did not render the application shell"
-        success_msg: "An unrouted path renders the application shell, so the health endpoint's body is meaningful"
+            - name: Show which container port Ghostfolio was reached through
+              ansible.builtin.debug:
+                msg: >-
+                  Reached Ghostfolio on container port {{ ghostfolio_container_http_port }},
+                  which only a process that read the role's env file listens on
 
-    # The same one level down: an unknown path under the API prefix is a 404
-    # rather than the shell, so `/api/v1/health` really is a route and not a
-    # catch-all.
-    - name: Request an API path Ghostfolio does not route
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/api/v1/healthz"
-        method: GET
-        follow_redirects: none
-        status_code: [404]
-      register: ghostfolio_unrouted_api
+            # `/api/v1/health` is the first thing here that cannot lie, and only
+            # its body can be trusted - a status code on the shell above proves
+            # nothing. This endpoint answers `{"status":"OK"}` as JSON, and it does
+            # not answer at all while Redis is unreachable: a container pointed at
+            # a bad `REDIS_HOST` leaves this request open until it times out while
+            # still serving the shell on `/en` quite happily.
+            #
+            # Short window, since Ghostfolio is already serving by the time this
+            # runs.
+            - name: Wait for the Ghostfolio health endpoint to answer (up to 3m)
+              ansible.builtin.uri:
+                url: "{{ ghostfolio_verify_base_url }}/api/v1/health"
+                method: GET
+                follow_redirects: none
+                status_code: [200, 404, 500, 502, 503]
+                timeout: 10
+                return_content: true
+              register: ghostfolio_health
+              until: ghostfolio_health.status == 200 and (ghostfolio_health.json.status | default('')) == 'OK'
+              retries: 36
+              delay: 5
 
-    - name: Assert an unknown API path is a 404
-      ansible.builtin.assert:
-        that: ghostfolio_unrouted_api.status == 404
-        fail_msg: "An unknown API path answered {{ ghostfolio_unrouted_api.status }} rather than 404"
-        success_msg: "An unknown API path is a 404, so /api/v1/health is a real route"
+          rescue:
+            - name: Retrieve the Ghostfolio systemd service log after a failed wait
+              ansible.builtin.command:
+                cmd: journalctl --no-pager --output=cat --unit=ghostfolio.service
+              register: ghostfolio_failure_log
+              changed_when: false
+              failed_when: false
 
-    # Ghostfolio's own account model, over the API rather than through the
-    # sign-up wizard: POSTing to this endpoint creates a user and hands back
-    # both its security token and a usable JWT. The very first user of an
-    # instance becomes its administrator, which is what the version check below
-    # needs - so this play expects a database no earlier verify run has already
-    # created a user in, which is what `molecule test` provides.
-    - name: Create the first Ghostfolio user over the API
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/api/v1/user"
-        method: POST
-        body_format: json
-        body: {}
-        status_code: [200, 201]
-        timeout: 60
-      register: ghostfolio_created_user
+            - name: Fail with the Ghostfolio systemd service log
+              ansible.builtin.fail:
+                msg: >-
+                  Ghostfolio never became usable.
+                  {{ ghostfolio_failure_log.stdout | default('no journal output') }}
 
-    - name: Assert the created user is the instance administrator
-      ansible.builtin.assert:
-        that:
-          - ghostfolio_created_user.json.role == 'ADMIN'
-          - ghostfolio_created_user.json.accessToken | default('') | length > 0
-          - ghostfolio_created_user.json.authToken | default('') | length > 0
-        fail_msg: >-
-          Creating a user returned role '{{ ghostfolio_created_user.json.role | default('none') }}';
-          the first user of a fresh instance must be its administrator
-        success_msg: "Created the first user, and Ghostfolio made it an administrator"
+        - name: Assert the Ghostfolio health endpoint reports OK
+          ansible.builtin.assert:
+            that: ghostfolio_health.json.status == 'OK'
+            fail_msg: "The Ghostfolio health endpoint answered '{{ ghostfolio_health.content | default('none') | trim }}'"
+            success_msg: "The Ghostfolio health endpoint reports OK"
 
-    - name: Remember the credentials of the created user
-      ansible.builtin.set_fact:
-        ghostfolio_verify_auth_header:
-          Authorization: "Bearer {{ ghostfolio_created_user.json.authToken }}"
+        # Proof that the health check above is worth anything: a path Ghostfolio
+        # does not route comes back 200 with the single-page application shell,
+        # which is exactly what `/api/v1/health` would look like if it were not a
+        # real route.
+        - name: Request a path Ghostfolio does not route
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/en/molecule-no-such-path"
+            method: GET
+            follow_redirects: none
+            status_code: [200]
+            return_content: true
+          register: ghostfolio_unrouted
 
-    - name: Read the created user back
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/api/v1/user"
-        method: GET
-        headers: "{{ ghostfolio_verify_auth_header }}"
-        status_code: [200]
-        timeout: 60
-      register: ghostfolio_user
+        - name: Assert an unrouted path is answered with the application shell rather than a health report
+          ansible.builtin.assert:
+            that:
+              - "'Ghostfolio' in ghostfolio_unrouted.content"
+              - "'\"status\"' not in ghostfolio_unrouted.content"
+            fail_msg: "A path Ghostfolio does not route did not render the application shell"
+            success_msg: "An unrouted path renders the application shell, so the health endpoint's body is meaningful"
 
-    - name: Assert the created user authenticates and carries administrator permissions
-      ansible.builtin.assert:
-        that:
-          - ghostfolio_user.json.id | default('') | length > 0
-          - "'accessAdminControl' in ghostfolio_user.json.permissions"
-        fail_msg: "The JWT handed out at creation does not authenticate as an administrator"
-        success_msg: "The JWT handed out at creation authenticates as user {{ ghostfolio_user.json.id }}"
+        # The same one level down: an unknown path under the API prefix is a 404
+        # rather than the shell, so `/api/v1/health` really is a route and not a
+        # catch-all.
+        - name: Request an API path Ghostfolio does not route
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/api/v1/healthz"
+            method: GET
+            follow_redirects: none
+            status_code: [404]
+          register: ghostfolio_unrouted_api
 
-    # The running build reporting its own version, from the endpoint that backs
-    # the "Admin Control" page. This is the number Renovate bumps in
-    # defaults/main.yml, checked against what is actually executing.
-    - name: Query the version of the running Ghostfolio
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/api/v1/admin"
-        method: GET
-        headers: "{{ ghostfolio_verify_auth_header }}"
-        status_code: [200]
-        timeout: 60
-      register: ghostfolio_admin
+        - name: Assert an unknown API path is a 404
+          ansible.builtin.assert:
+            that: ghostfolio_unrouted_api.status == 404
+            fail_msg: "An unknown API path answered {{ ghostfolio_unrouted_api.status }} rather than 404"
+            success_msg: "An unknown API path is a 404, so /api/v1/health is a real route"
 
-    # A second, independent leaf for the same claim: the package manifest of
-    # the bundle `node` is running, rather than a number the API could be
-    # reporting from anywhere. This one also covers the self-build case, where
-    # no registry tag was involved at all.
-    - name: Query the version of the code the Ghostfolio container is running
-      ansible.builtin.command:
-        argv:
-          - docker
-          - exec
-          - "{{ ghostfolio_defaults.ghostfolio_identifier }}"
-          - node
-          - -e
-          - |
-            console.log(require("/ghostfolio/apps/api/package.json").version)
-      register: ghostfolio_package_version
-      changed_when: false
+        # Ghostfolio's own account model, over the API rather than through the
+        # sign-up wizard: POSTing to this endpoint creates a user and hands back
+        # both its security token and a usable JWT. The very first user of an
+        # instance becomes its administrator, which is what the version check below
+        # needs - so this play expects a database no earlier verify run has already
+        # created a user in, which is what `molecule test` provides.
+        - name: Create the first Ghostfolio user over the API
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/api/v1/user"
+            method: POST
+            body_format: json
+            body: {}
+            status_code: [200, 201]
+            timeout: 60
+          register: ghostfolio_created_user
 
-    - name: Assert the running Ghostfolio is the version this role installs
-      ansible.builtin.assert:
-        that:
-          - ghostfolio_admin.json.version == ghostfolio_defaults.ghostfolio_version
-          - ghostfolio_package_version.stdout | trim == ghostfolio_defaults.ghostfolio_version
-        fail_msg: "Ghostfolio reports {{ ghostfolio_admin.json.version | default('none') }}, expected {{ ghostfolio_defaults.ghostfolio_version }}"
-        success_msg: "Ghostfolio reports {{ ghostfolio_admin.json.version }}"
+        - name: Assert the created user is the instance administrator
+          ansible.builtin.assert:
+            that:
+              - ghostfolio_created_user.json.role == 'ADMIN'
+              - ghostfolio_created_user.json.accessToken | default('') | length > 0
+              - ghostfolio_created_user.json.authToken | default('') | length > 0
+            fail_msg: >-
+              Creating a user returned role '{{ ghostfolio_created_user.json.role | default('none') }}';
+              the first user of a fresh instance must be its administrator
+            success_msg: "Created the first user, and Ghostfolio made it an administrator"
 
-    # Everything the role puts in the env file has to arrive in the process,
-    # not merely in a file on disk. `PORT` is proven by the request above
-    # having been answered at all; this covers the escape hatch that lets an
-    # operator set anything Ghostfolio supports but this role has no variable
-    # for.
-    - name: Read the environment of the running Ghostfolio process
-      ansible.builtin.command:
-        cmd: docker exec {{ ghostfolio_defaults.ghostfolio_identifier }} env
-      register: ghostfolio_container_env
-      changed_when: false
+        - name: Remember the credentials of the created user
+          ansible.builtin.set_fact:
+            ghostfolio_verify_auth_header:
+              Authorization: "Bearer {{ ghostfolio_created_user.json.authToken }}"
 
-    - name: Assert additional environment variables reach the running process
-      ansible.builtin.assert:
-        that: "'MOLECULE_MARKER=ghostfolio-molecule-default' in ghostfolio_container_env.stdout_lines"
-        fail_msg: "The marker this scenario put in ghostfolio_environment_variables_additional_variables never reached the process"
-        success_msg: "Variables from ghostfolio_environment_variables_additional_variables reach the running process"
+        - name: Read the created user back
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/api/v1/user"
+            method: GET
+            headers: "{{ ghostfolio_verify_auth_header }}"
+            status_code: [200]
+            timeout: 60
+          register: ghostfolio_user
 
-    # Writing through the API, which is what an operator's data actually is.
-    - name: Create an account over the Ghostfolio API
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/api/v1/account"
-        method: POST
-        headers: "{{ ghostfolio_verify_auth_header }}"
-        body_format: json
-        body:
-          balance: 1234.56
-          currency: USD
-          name: "{{ ghostfolio_verify_account_name }}"
-          platformId: null
-          comment: "{{ ghostfolio_verify_account_comment }}"
-        status_code: [200, 201]
-        timeout: 60
-      register: ghostfolio_created_account
+        - name: Assert the created user authenticates and carries administrator permissions
+          ansible.builtin.assert:
+            that:
+              - ghostfolio_user.json.id | default('') | length > 0
+              - "'accessAdminControl' in ghostfolio_user.json.permissions"
+            fail_msg: "The JWT handed out at creation does not authenticate as an administrator"
+            success_msg: "The JWT handed out at creation authenticates as user {{ ghostfolio_user.json.id }}"
 
-    - name: Read the accounts back over the Ghostfolio API
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/api/v1/account"
-        method: GET
-        headers: "{{ ghostfolio_verify_auth_header }}"
-        status_code: [200]
-        timeout: 60
-      register: ghostfolio_accounts
+        # The running build reporting its own version, from the endpoint that backs
+        # the "Admin Control" page. This is the number Renovate bumps in
+        # defaults/main.yml, checked against what is actually executing.
+        - name: Query the version of the running Ghostfolio
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/api/v1/admin"
+            method: GET
+            headers: "{{ ghostfolio_verify_auth_header }}"
+            status_code: [200]
+            timeout: 60
+          register: ghostfolio_admin
 
-    - name: Assert the account written over the API reads back over the API
-      ansible.builtin.assert:
-        that:
-          - ghostfolio_created_account.json.id | default('') | length > 0
-          - ghostfolio_verify_account_name in (ghostfolio_accounts.json.accounts | map(attribute='name') | list)
-          - ghostfolio_created_account.json.id in (ghostfolio_accounts.json.accounts | map(attribute='id') | list)
-        fail_msg: "The account created over the API is not among the accounts Ghostfolio lists"
-        success_msg: "The account created over the API reads back as {{ ghostfolio_created_account.json.id }}"
+        # A second, independent leaf for the same claim: the package manifest of
+        # the bundle `node` is running, rather than a number the API could be
+        # reporting from anywhere. This one also covers the self-build case, where
+        # no registry tag was involved at all.
+        - name: Query the version of the code the Ghostfolio container is running
+          ansible.builtin.command:
+            argv:
+              - docker
+              - exec
+              - "{{ ghostfolio_defaults.ghostfolio_identifier }}"
+              - node
+              - -e
+              - |
+                console.log(require("/ghostfolio/apps/api/package.json").version)
+          register: ghostfolio_package_version
+          changed_when: false
 
-    # Everything above would read the same if Ghostfolio had quietly migrated
-    # into some other database, so the row is looked for in the container this
-    # scenario started, at the other end of the Unix socket the role
-    # bind-mounts.
-    - name: Look for that account in the Postgres container
-      ansible.builtin.command:
-        cmd: "{{ ghostfolio_verify_psql_command }} {{ ghostfolio_verify_account_query | trim | quote }}"
-      register: ghostfolio_db_account
-      changed_when: false
+        - name: Assert the running Ghostfolio is the version this role installs
+          ansible.builtin.assert:
+            that:
+              - ghostfolio_admin.json.version == ghostfolio_defaults.ghostfolio_version
+              - ghostfolio_package_version.stdout | trim == ghostfolio_defaults.ghostfolio_version
+            fail_msg: "Ghostfolio reports {{ ghostfolio_admin.json.version | default('none') }}, expected {{ ghostfolio_defaults.ghostfolio_version }}"
+            success_msg: "Ghostfolio reports {{ ghostfolio_admin.json.version }}"
 
-    - name: Assert the account landed in that database
-      ansible.builtin.assert:
-        that: ghostfolio_db_account.stdout | trim | int == 1
-        fail_msg: >-
-          The account written over the API is not in '{{ ghostfolio_database_name }}'
-          ({{ ghostfolio_db_account.stdout | trim }} matching rows) - Ghostfolio is not using it
-        success_msg: "The account written over the API is a row in '{{ ghostfolio_database_name }}'"
+        # Everything the role puts in the env file has to arrive in the process,
+        # not merely in a file on disk. `PORT` is proven by the request above
+        # having been answered at all; this covers the escape hatch that lets an
+        # operator set anything Ghostfolio supports but this role has no variable
+        # for.
+        - name: Read the environment of the running Ghostfolio process
+          ansible.builtin.command:
+            cmd: docker exec {{ ghostfolio_defaults.ghostfolio_identifier }} env
+          register: ghostfolio_container_env
+          changed_when: false
 
-    # A populated bookkeeping table is the migration run itself leaving a
-    # trace, rather than a schema that merely happens to have tables in it.
-    - name: Count the migrations Prisma recorded in the Postgres container
-      ansible.builtin.command:
-        cmd: "{{ ghostfolio_verify_psql_command }} {{ ghostfolio_verify_migrations_query | quote }}"
-      register: ghostfolio_db_migrations
-      changed_when: false
+        - name: Assert additional environment variables reach the running process
+          ansible.builtin.assert:
+            that: "'MOLECULE_MARKER=ghostfolio-molecule-default' in ghostfolio_container_env.stdout_lines"
+            fail_msg: "The marker this scenario put in ghostfolio_environment_variables_additional_variables never reached the process"
+            success_msg: "Variables from ghostfolio_environment_variables_additional_variables reach the running process"
 
-    - name: Assert Prisma recorded its migrations in that database
-      ansible.builtin.assert:
-        that: ghostfolio_db_migrations.stdout | trim | int > 0
-        fail_msg: "Prisma recorded no completed migrations in '{{ ghostfolio_database_name }}'"
-        success_msg: "Prisma recorded {{ ghostfolio_db_migrations.stdout | trim }} completed migrations in '{{ ghostfolio_database_name }}'"
+        # Writing through the API, which is what an operator's data actually is.
+        - name: Create an account over the Ghostfolio API
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/api/v1/account"
+            method: POST
+            headers: "{{ ghostfolio_verify_auth_header }}"
+            body_format: json
+            body:
+              balance: 1234.56
+              currency: USD
+              name: "{{ ghostfolio_verify_account_name }}"
+              platformId: null
+              comment: "{{ ghostfolio_verify_account_comment }}"
+            status_code: [200, 201]
+            timeout: 60
+          register: ghostfolio_created_account
 
-    # The other data-store this role wires up. Asking for the portfolio makes
-    # Ghostfolio compute a snapshot, which it caches under a key named after
-    # the user - so the key can only appear if this Valkey is the one the
-    # process is talking to, and it ties that store to the user created here
-    # rather than to anything that happened to be running.
-    #
-    # This is asked separately because reaching Redis and reaching Postgres are
-    # different claims, and a role that got `REDIS_HOST` wrong would still pass
-    # everything above it.
-    - name: Ask Ghostfolio for the portfolio of the created user
-      ansible.builtin.uri:
-        url: "{{ ghostfolio_verify_base_url }}/api/v1/portfolio/details"
-        method: GET
-        headers: "{{ ghostfolio_verify_auth_header }}"
-        status_code: [200]
-        timeout: 120
-      register: ghostfolio_portfolio
+        - name: Read the accounts back over the Ghostfolio API
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/api/v1/account"
+            method: GET
+            headers: "{{ ghostfolio_verify_auth_header }}"
+            status_code: [200]
+            timeout: 60
+          register: ghostfolio_accounts
 
-    - name: Wait for the portfolio snapshot to appear in the Valkey container (up to 60s)
-      ansible.builtin.command:
-        argv:
-          - docker
-          - exec
-          - "{{ valkey_identifier | default('valkey') }}"
-          - valkey-cli
-          - KEYS
-          - "portfolio-snapshot-{{ ghostfolio_user.json.id }}"
-      register: ghostfolio_valkey_keys
-      until: ghostfolio_valkey_keys.stdout | trim | length > 0
-      retries: 20
-      delay: 3
-      changed_when: false
+        - name: Assert the account written over the API reads back over the API
+          ansible.builtin.assert:
+            that:
+              - ghostfolio_created_account.json.id | default('') | length > 0
+              - ghostfolio_verify_account_name in (ghostfolio_accounts.json.accounts | map(attribute='name') | list)
+              - ghostfolio_created_account.json.id in (ghostfolio_accounts.json.accounts | map(attribute='id') | list)
+            fail_msg: "The account created over the API is not among the accounts Ghostfolio lists"
+            success_msg: "The account created over the API reads back as {{ ghostfolio_created_account.json.id }}"
 
-    - name: Assert Ghostfolio cached that user's portfolio in that Valkey
-      ansible.builtin.assert:
-        that: ghostfolio_valkey_keys.stdout | trim == 'portfolio-snapshot-' ~ ghostfolio_user.json.id
-        fail_msg: "No portfolio snapshot for user {{ ghostfolio_user.json.id }} in Valkey - Ghostfolio is not using it"
-        success_msg: "Ghostfolio cached {{ ghostfolio_valkey_keys.stdout | trim }} in Valkey"
+        # Everything above would read the same if Ghostfolio had quietly migrated
+        # into some other database, so the row is looked for in the container this
+        # scenario started, at the other end of the Unix socket the role
+        # bind-mounts.
+        - name: Look for that account in the Postgres container
+          ansible.builtin.command:
+            cmd: "{{ ghostfolio_verify_psql_command }} {{ ghostfolio_verify_account_query | trim | quote }}"
+          register: ghostfolio_db_account
+          changed_when: false
 
-    # And the same store from the connection side, which does not depend on a
-    # cache entry's lifetime: Ghostfolio's job queues hold connections open for
-    # as long as it runs, and nothing else in this scenario talks to Valkey.
-    - name: Count the clients connected to the Valkey container
-      ansible.builtin.command:
-        argv:
-          - docker
-          - exec
-          - "{{ valkey_identifier | default('valkey') }}"
-          - valkey-cli
-          - CLIENT
-          - LIST
-      register: ghostfolio_valkey_clients
-      changed_when: false
+        - name: Assert the account landed in that database
+          ansible.builtin.assert:
+            that: ghostfolio_db_account.stdout | trim | int == 1
+            fail_msg: >-
+              The account written over the API is not in '{{ ghostfolio_database_name }}'
+              ({{ ghostfolio_db_account.stdout | trim }} matching rows) - Ghostfolio is not using it
+            success_msg: "The account written over the API is a row in '{{ ghostfolio_database_name }}'"
 
-    - name: Assert Ghostfolio holds connections to that Valkey
-      ansible.builtin.assert:
-        that: ghostfolio_valkey_clients.stdout_lines | length > 1
-        fail_msg: "Valkey has no clients beyond this query itself - Ghostfolio is not connected to it"
-        success_msg: "Valkey is serving {{ ghostfolio_valkey_clients.stdout_lines | length }} connections"
+        # A populated bookkeeping table is the migration run itself leaving a
+        # trace, rather than a schema that merely happens to have tables in it.
+        - name: Count the migrations Prisma recorded in the Postgres container
+          ansible.builtin.command:
+            cmd: "{{ ghostfolio_verify_psql_command }} {{ ghostfolio_verify_migrations_query | quote }}"
+          register: ghostfolio_db_migrations
+          changed_when: false
 
-    - name: Show the Ghostfolio verification summary
-      ansible.builtin.debug:
-        msg:
-          - "Ghostfolio systemd: {{ ghostfolio_service.status.ActiveState }}"
-          - "Ghostfolio serving on container port {{ ghostfolio_container_http_port }}: {{ ghostfolio_serving.status }}"
-          - "Ghostfolio health: {{ ghostfolio_health.status }} {{ ghostfolio_health.json.status }}"
-          - "Ghostfolio version over HTTP: {{ ghostfolio_admin.json.version }}"
-          - "Ghostfolio version in the running bundle: {{ ghostfolio_package_version.stdout | trim }}"
-          - "Administrator created over the API: {{ ghostfolio_user.json.id }}"
-          - "Account round-tripped over the API: {{ ghostfolio_created_account.json.id }}"
-          - "Rows matching that account in Postgres: {{ ghostfolio_db_account.stdout | trim }}"
-          - "Migrations recorded in Postgres: {{ ghostfolio_db_migrations.stdout | trim }}"
-          - "Portfolio snapshot cached in Valkey: {{ ghostfolio_valkey_keys.stdout | trim }}"
-          - "Clients connected to Valkey: {{ ghostfolio_valkey_clients.stdout_lines | length }}"
+        - name: Assert Prisma recorded its migrations in that database
+          ansible.builtin.assert:
+            that: ghostfolio_db_migrations.stdout | trim | int > 0
+            fail_msg: "Prisma recorded no completed migrations in '{{ ghostfolio_database_name }}'"
+            success_msg: "Prisma recorded {{ ghostfolio_db_migrations.stdout | trim }} completed migrations in '{{ ghostfolio_database_name }}'"
+
+        # The other data-store this role wires up. Asking for the portfolio makes
+        # Ghostfolio compute a snapshot, which it caches under a key named after
+        # the user - so the key can only appear if this Valkey is the one the
+        # process is talking to, and it ties that store to the user created here
+        # rather than to anything that happened to be running.
+        #
+        # This is asked separately because reaching Redis and reaching Postgres are
+        # different claims, and a role that got `REDIS_HOST` wrong would still pass
+        # everything above it.
+        - name: Ask Ghostfolio for the portfolio of the created user
+          ansible.builtin.uri:
+            url: "{{ ghostfolio_verify_base_url }}/api/v1/portfolio/details"
+            method: GET
+            headers: "{{ ghostfolio_verify_auth_header }}"
+            status_code: [200]
+            timeout: 120
+          register: ghostfolio_portfolio
+
+        - name: Wait for the portfolio snapshot to appear in the Valkey container (up to 60s)
+          ansible.builtin.command:
+            argv:
+              - docker
+              - exec
+              - "{{ valkey_identifier | default('valkey') }}"
+              - valkey-cli
+              - KEYS
+              - "portfolio-snapshot-{{ ghostfolio_user.json.id }}"
+          register: ghostfolio_valkey_keys
+          until: ghostfolio_valkey_keys.stdout | trim | length > 0
+          retries: 20
+          delay: 3
+          changed_when: false
+
+        - name: Assert Ghostfolio cached that user's portfolio in that Valkey
+          ansible.builtin.assert:
+            that: ghostfolio_valkey_keys.stdout | trim == 'portfolio-snapshot-' ~ ghostfolio_user.json.id
+            fail_msg: "No portfolio snapshot for user {{ ghostfolio_user.json.id }} in Valkey - Ghostfolio is not using it"
+            success_msg: "Ghostfolio cached {{ ghostfolio_valkey_keys.stdout | trim }} in Valkey"
+
+        # And the same store from the connection side, which does not depend on a
+        # cache entry's lifetime: Ghostfolio's job queues hold connections open for
+        # as long as it runs, and nothing else in this scenario talks to Valkey.
+        - name: Count the clients connected to the Valkey container
+          ansible.builtin.command:
+            argv:
+              - docker
+              - exec
+              - "{{ valkey_identifier | default('valkey') }}"
+              - valkey-cli
+              - CLIENT
+              - LIST
+          register: ghostfolio_valkey_clients
+          changed_when: false
+
+        - name: Assert Ghostfolio holds connections to that Valkey
+          ansible.builtin.assert:
+            that: ghostfolio_valkey_clients.stdout_lines | length > 1
+            fail_msg: "Valkey has no clients beyond this query itself - Ghostfolio is not connected to it"
+            success_msg: "Valkey is serving {{ ghostfolio_valkey_clients.stdout_lines | length }} connections"
+
+        - name: Show the Ghostfolio verification summary
+          ansible.builtin.debug:
+            msg:
+              - "Ghostfolio systemd: {{ ghostfolio_service.status.ActiveState }}"
+              - "Ghostfolio serving on container port {{ ghostfolio_container_http_port }}: {{ ghostfolio_serving.status }}"
+              - "Ghostfolio health: {{ ghostfolio_health.status }} {{ ghostfolio_health.json.status }}"
+              - "Ghostfolio version over HTTP: {{ ghostfolio_admin.json.version }}"
+              - "Ghostfolio version in the running bundle: {{ ghostfolio_package_version.stdout | trim }}"
+              - "Administrator created over the API: {{ ghostfolio_user.json.id }}"
+              - "Account round-tripped over the API: {{ ghostfolio_created_account.json.id }}"
+              - "Rows matching that account in Postgres: {{ ghostfolio_db_account.stdout | trim }}"
+              - "Migrations recorded in Postgres: {{ ghostfolio_db_migrations.stdout | trim }}"
+              - "Portfolio snapshot cached in Valkey: {{ ghostfolio_valkey_keys.stdout | trim }}"
+              - "Clients connected to Valkey: {{ ghostfolio_valkey_clients.stdout_lines | length }}"
 
       rescue:
         # Whatever went wrong, the reason is almost always in the systemd service log.
