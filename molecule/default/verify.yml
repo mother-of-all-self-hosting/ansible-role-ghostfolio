@@ -36,6 +36,11 @@
     ghostfolio_verify_account_query: >-
       SELECT count(*) FROM "Account" WHERE comment = '{{ ghostfolio_verify_account_comment }}'
 
+    ghostfolio_verify_units:
+      - ghostfolio.service
+      - postgres.service
+      - valkey.service
+
   tasks:
     - name: Verify that Ghostfolio works
       block:
@@ -47,13 +52,14 @@
             file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
             name: ghostfolio_defaults
 
-        - name: Wait for the Ghostfolio systemd service to become active (up to 180s)
+        - name: Wait for the Ghostfolio systemd services to become active (up to 180s each)
           ansible.builtin.systemd_service:
-            name: ghostfolio.service
-          register: ghostfolio_service
-          until: ghostfolio_service.status.ActiveState == 'active'
+            name: "{{ item }}"
+          register: ghostfolio_services
+          until: ghostfolio_services.status.ActiveState == 'active'
           retries: 36
           delay: 5
+          loop: "{{ ghostfolio_verify_units }}"
           # So that giving up is reported by the assertion below rather than as a
           # wall of systemd unit properties.
           failed_when: false
@@ -61,17 +67,20 @@
         # `Restart=always` in the systemd unit means that even a container which crashes
         # and gets restarted reads as active here, so this is a precondition rather than
         # a result.
-        - name: Assert the Ghostfolio systemd service is active
+        - name: Assert the Ghostfolio systemd services are active
           ansible.builtin.assert:
-            that: ghostfolio_service.status.ActiveState == 'active'
-            fail_msg: "ghostfolio.service is not active ({{ ghostfolio_service.status.ActiveState }})"
-            success_msg: "ghostfolio.service is active"
+            that: ghostfolio_services.results | map(attribute='status.ActiveState') | unique | list == ['active']
+            fail_msg: >-
+              Not every service is active:
+              {{ dict(ghostfolio_verify_units | zip(ghostfolio_services.results | map(attribute='status.ActiveState'))) }}
+            success_msg: "Every systemd service is active"
 
-        - name: Retrieve the Ghostfolio systemd service log for debugging
+        - name: Retrieve the Ghostfolio systemd services log for debugging
           when: ghostfolio_debug_service_enabled | bool
           ansible.builtin.command:
-            cmd: journalctl --no-pager --output=cat --unit=ghostfolio.service
+            cmd: "journalctl --no-pager --output=cat --unit={{ item }}"
           changed_when: false
+          loop: "{{ ghostfolio_verify_units }}"
 
         # Both waits, so that whichever of them runs out says so with the
         # application's own output beside it rather than with a bare timeout.
@@ -424,7 +433,7 @@
         - name: Show the Ghostfolio verification summary
           ansible.builtin.debug:
             msg:
-              - "Ghostfolio systemd: {{ ghostfolio_service.status.ActiveState }}"
+              - "Ghostfolio systemd: {% for unit, state in ghostfolio_verify_units | zip(ghostfolio_services.results | map(attribute='status.ActiveState')) %}{{ unit }} ({{ state }}){% if not loop.last %}, {% endif %}{% endfor %}"
               - "Ghostfolio serving on container port {{ ghostfolio_container_http_port }}: {{ ghostfolio_serving.status }}"
               - "Ghostfolio health: {{ ghostfolio_health.status }} {{ ghostfolio_health.json.status }}"
               - "Ghostfolio version over HTTP: {{ ghostfolio_admin.json.version }}"
