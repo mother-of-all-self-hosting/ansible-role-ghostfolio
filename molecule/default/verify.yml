@@ -434,10 +434,9 @@
           ansible.builtin.debug:
             msg:
               - "Ghostfolio systemd: {% for unit, state in ghostfolio_verify_units | zip(ghostfolio_services.results | map(attribute='status.ActiveState')) %}{{ unit }} ({{ state }}){% if not loop.last %}, {% endif %}{% endfor %}"
+              - "Ghostfolio version: {{ ghostfolio_admin.json.version }}"
               - "Ghostfolio serving on container port {{ ghostfolio_container_http_port }}: {{ ghostfolio_serving.status }}"
               - "Ghostfolio health: {{ ghostfolio_health.status }} {{ ghostfolio_health.json.status }}"
-              - "Ghostfolio version over HTTP: {{ ghostfolio_admin.json.version }}"
-              - "Ghostfolio version in the running bundle: {{ ghostfolio_package_version.stdout | trim }}"
               - "Administrator created over the API: {{ ghostfolio_user.json.id }}"
               - "Account round-tripped over the API: {{ ghostfolio_created_account.json.id }}"
               - "Rows matching that account in Postgres: {{ ghostfolio_db_account.stdout | trim }}"
