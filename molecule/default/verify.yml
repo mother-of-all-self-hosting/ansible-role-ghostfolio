@@ -141,12 +141,15 @@
               until: ghostfolio_health.status == 200 and (ghostfolio_health.json.status | default('')) == 'OK'
               retries: 36
               delay: 5
+              # So that giving up is reported by the assertion below rather than as a
+              # wall of systemd unit properties.
+              failed_when: false
 
-        - name: Assert the Ghostfolio health endpoint reports OK
+        - name: Assert Ghostfolio reports itself healthy
           ansible.builtin.assert:
             that: ghostfolio_health.json.status == 'OK'
-            fail_msg: "The Ghostfolio health endpoint answered '{{ ghostfolio_health.content | default('none') | trim }}'"
-            success_msg: "The Ghostfolio health endpoint reports OK"
+            fail_msg: "Ghostfolio did not report itself healthy: {{ ghostfolio_health.content | default('no response') }}"
+            success_msg: "Ghostfolio reports itself healthy"
 
         # Proof that the health check above is worth anything: a path Ghostfolio
         # does not route comes back 200 with the single-page application shell,
