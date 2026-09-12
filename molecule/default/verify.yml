@@ -142,20 +142,6 @@
               retries: 36
               delay: 5
 
-          rescue:
-            - name: Retrieve the Ghostfolio systemd service log after a failed wait
-              ansible.builtin.command:
-                cmd: journalctl --no-pager --output=cat --unit=ghostfolio.service
-              register: ghostfolio_failure_log
-              changed_when: false
-              failed_when: false
-
-            - name: Fail with the Ghostfolio systemd service log
-              ansible.builtin.fail:
-                msg: >-
-                  Ghostfolio never became usable.
-                  {{ ghostfolio_failure_log.stdout | default('no journal output') }}
-
         - name: Assert the Ghostfolio health endpoint reports OK
           ansible.builtin.assert:
             that: ghostfolio_health.json.status == 'OK'
