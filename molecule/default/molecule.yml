@@ -30,6 +30,7 @@ provisioner:
       all:
         # Helper variables
         ghostfolio_debug_service_enabled: false
+        ghostfolio_restarts_check_enabled: true
 
         # Variables for Ghostfolio
         ghostfolio_uid: 1000
