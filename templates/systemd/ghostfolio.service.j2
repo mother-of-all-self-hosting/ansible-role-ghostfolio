@@ -54,11 +54,12 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network conne
 
 ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ ghostfolio_identifier }}
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ ghostfolio_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ ghostfolio_container_stop_grace_time_seconds }} {{ ghostfolio_identifier }} 2>/dev/null || true'
 ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ ghostfolio_identifier }} 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
+TimeoutStopSec={{ ghostfolio_container_stop_grace_time_seconds | int + 30 }}
 SyslogIdentifier={{ ghostfolio_identifier }}
 
 [Install]
