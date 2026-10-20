@@ -365,6 +365,10 @@
         # process is talking to, and it ties that store to the user created here
         # rather than to anything that happened to be running.
         #
+        # The key is matched by its prefix, because Ghostfolio appends suffixes to it
+        # (the performance calculation type since v3.72.0, e.g. `-ROAI`, and a hash of
+        # any filters), which are not this role's concern.
+        #
         # This is asked separately because reaching Redis and reaching Postgres are
         # different claims, and a role that got `REDIS_HOST` wrong would still pass
         # everything above it.
@@ -385,7 +389,7 @@
               - "{{ valkey_identifier | default('valkey') }}"
               - valkey-cli
               - KEYS
-              - "portfolio-snapshot-{{ ghostfolio_user.json.id }}"
+              - "portfolio-snapshot-{{ ghostfolio_user.json.id }}*"
           register: ghostfolio_valkey_keys
           until: ghostfolio_valkey_keys.stdout | trim | length > 0
           retries: 20
@@ -394,7 +398,7 @@
 
         - name: Assert Ghostfolio cached that user's portfolio in that Valkey
           ansible.builtin.assert:
-            that: ghostfolio_valkey_keys.stdout | trim == 'portfolio-snapshot-' ~ ghostfolio_user.json.id
+            that: ghostfolio_valkey_keys.stdout_lines | select('match', 'portfolio-snapshot-' ~ ghostfolio_user.json.id ~ '(-|$)') | list | length > 0
             fail_msg: "No portfolio snapshot for user {{ ghostfolio_user.json.id }} in Valkey - Ghostfolio is not using it"
             success_msg: "Ghostfolio cached {{ ghostfolio_valkey_keys.stdout | trim }} in Valkey"
 
