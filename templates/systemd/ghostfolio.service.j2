@@ -28,6 +28,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --log-driver=none \
       --user={{ ghostfolio_uid }}:{{ ghostfolio_gid }} \
       --cap-drop=ALL \
+      --read-only \
       --network={{ ghostfolio_container_network }} \
       {% if ghostfolio_container_http_host_bind_port %}
       -p {{ ghostfolio_container_http_host_bind_port }}:{{ ghostfolio_container_http_port }} \
