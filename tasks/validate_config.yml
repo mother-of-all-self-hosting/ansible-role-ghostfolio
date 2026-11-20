@@ -31,9 +31,6 @@
   with_items:
     - { "name": "ghostfolio_uid", when: true }
     - { "name": "ghostfolio_gid", when: true }
-    - { "name": "ghostfolio_hostname", when: true }
-    - { "name": "ghostfolio_path_prefix", when: true }
-    - { "name": "ghostfolio_container_network", when: true }
     - { "name": "ghostfolio_database_socket_path_host", when: "{{ ghostfolio_database_socket_enabled }}" }
     - { "name": "ghostfolio_database_hostname", when: "{{ not ghostfolio_database_socket_enabled }}" }
     - { "name": "ghostfolio_database_password", when: true }
