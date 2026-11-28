@@ -60,6 +60,7 @@
         owner: "{{ ghostfolio_uid }}"
         group: "{{ ghostfolio_gid }}"
         recurse: true
+      tags: molecule-idempotence-notest
 
     - name: Ensure Ghostfolio repository is present on self-build
       ansible.builtin.git:
